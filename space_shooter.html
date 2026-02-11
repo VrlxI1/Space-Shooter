@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Shooter - Boss Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #000428, #004e92);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .game-container {
+            position: relative;
+            text-align: center;
+        }
+
+        #gameCanvas {
+            border: 3px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            background: #000;
+            display: none;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff88;
+            font-size: 20px;
+            text-shadow: 0 0 10px rgba(11, 58, 36, 0.8);
+            z-index: 10;
+            display: none;
+        }
+
+        .boss-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-size: 72px;
+            font-weight: bold;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 1);
+            z-index: 20;
+            display: none;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 16px;
+            display: none;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .instructions span {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        /* Screens */
+        .screen {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 60px;
+            border-radius: 20px;
+            border: 4px solid #00ff88;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: none;
+            position: relative;
+            z-index: 100;
+        }
+
+        .screen.active {
+            display: block !important;
+        }
+
+        .screen h1 {
+            color: #00ff88;
+            font-size: 64px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        }
+
+
+
+        .screen .subtitle {
+            color: #fff;
+            font-size: 20px;
+            margin-bottom: 40px;
+        }
+
+        .coins-display {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+
+        .coins-display span {
+            color: #ffd700;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+
+        .menu-button {
+            background: linear-gradient(to right, #00ff88, #00ccaa);
+            color: #000;
+            border: none;
+            padding: 20px 50px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .menu-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .menu-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .menu-button.secondary {
+            background: linear-gradient(to right, #ff00ff, #ff00aa);
+        }
+
+        .menu-button.danger {
+            background: linear-gradient(to right, #ff0066, #ff6600);
+        }
+
+        /* Mode Grid */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .mode-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #666;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .mode-card:hover {
+            border-color: #00ff88;
+            transform: translateY(-3px);
+        }
+
+        .mode-card.locked {
+            opacity: 0.5;
+        }
+
+        .mode-card h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+
+        .mode-card p {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .mode-card .multiplier {
+            color: #ffd700;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        /* Shop */
+        .shop-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #666;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            background: rgba(255, 0, 255, 0.3);
+            border-color: #ff00ff;
+            color: #ff00ff;
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .shop-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #666;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .shop-item:hover {
+            border-color: #ff00ff;
+            transform: translateY(-3px);
+        }
+
+        .shop-item h3 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .shop-item p {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .shop-item .price {
+            color: #ffd700;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .shop-item button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #666;
+        }
+
+        .stat-box h3 {
+            color: #00ff88;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .stat-box .value {
+            color: #fff;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* Leaderboard */
+        .leaderboard-entry {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #666;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin: 10px 0;
+            display: grid;
+            grid-template-columns: 50px 1fr 100px 100px;
+            gap: 15px;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .leaderboard-entry:hover {
+            border-color: #00ff88;
+            transform: translateX(5px);
+        }
+
+        .leaderboard-entry.top3 {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .leaderboard-rank {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            text-align: center;
+        }
+
+        .leaderboard-name {
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .leaderboard-score {
+            color: #00ff88;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .leaderboard-mode {
+            color: #aaa;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .name-input-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .name-input-modal.active {
+            display: flex;
+        }
+
+        .name-input-box {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            border: 4px solid #00ff88;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        }
+
+        .name-input-box h2 {
+            color: #00ff88;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .name-input-box input {
+            width: 300px;
+            padding: 15px;
+            font-size: 20px;
+            border: 2px solid #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            color: #fff;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .name-input-box input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        
+        <div class="hud" id="hud">
+            <div>Score: <span id="score">0</span></div>
+            <div>Coins: <span id="coins">0</span></div>
+            <div>Time: <span id="timer">0:00</span></div>
+        </div>
+
+        <div class="boss-warning" id="bossWarning">BOSS INCOMING!</div>
+
+        <div class="instructions" id="instructions">
+            Move: <span>Arrow Keys / WASD</span> | Shoot: <span>Space</span> | Pause: <span>ESC</span>
+        </div>
+
+        <!-- Main Menu -->
+        <div class="screen" id="mainMenu">
+            <h1>🚀 SPACE SHOOTER</h1>
+            <p class="subtitle">Defend the Galaxy</p>
+            <div class="coins-display">
+                💰 <span id="menuCoins">0</span>
+            </div>
+            <div>
+                <button class="menu-button" onclick="showScreen('modeSelect')">START GAME</button>
+                <button class="menu-button secondary" onclick="showScreen('shop')">SHOP</button>
+                <button class="menu-button secondary" onclick="showScreen('leaderboard')">LEADERBOARD</button>
+                <button class="menu-button danger" onclick="resetProgress()">RESET PROGRESS</button>
+            </div>
+        </div>
+
+        <!-- Mode Select -->
+        <div class="screen" id="modeSelect">
+            <h1>SELECT MODE</h1>
+            <div class="mode-grid">
+                <div class="mode-card" onclick="startGame('normal')">
+                    <h3>Normal</h3>
+                    <p>Standard difficulty. Boss at 3:00</p>
+                    <div class="multiplier">1x Coins</div>
+                    <button class="menu-button">PLAY</button>
+                </div>
+                <div class="mode-card" id="hardMode">
+                    <h3>Hard</h3>
+                    <p>More asteroids. Tougher boss at 3:00</p>
+                    <div class="multiplier">2x Coins</div>
+                    <button class="menu-button">PLAY</button>
+                </div>
+                <div class="mode-card locked" id="expertMode">
+                    <h3>Expert</h3>
+                    <p>Extreme challenge. Boss at 3:00</p>
+                    <div class="multiplier">3x Coins</div>
+                    <button class="menu-button" disabled>LOCKED</button>
+                </div>
+            </div>
+            <button class="menu-button secondary" onclick="showScreen('mainMenu')">BACK</button>
+        </div>
+
+        <!-- Shop -->
+        <div class="screen" id="shop">
+            <h1>SHOP</h1>
+            <div class="coins-display">
+                <span id="shopCoins">0</span> 💰
+            </div>
+            <div class="shop-tabs">
+                <button class="tab-button active" onclick="switchShopTab('upgrades')">UPGRADES</button>
+                <button class="tab-button" onclick="switchShopTab('ships')">SHIPS</button>
+                <button class="tab-button" onclick="switchShopTab('abilities')">ABILITIES</button>
+            </div>
+            <div id="upgradesTab" class="shop-items"></div>
+            <div id="shipsTab" class="shop-items" style="display: none;"></div>
+            <div id="abilitiesTab" class="shop-items" style="display: none;"></div>
+            <button class="menu-button secondary" onclick="showScreen('mainMenu')">BACK</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="screen" id="stats">
+            <h1>STATISTICS</h1>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3>High Score</h3>
+                    <div class="value" id="statHighScore">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Games Played</h3>
+                    <div class="value" id="statGames">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Kills</h3>
+                    <div class="value" id="statKills">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Coins</h3>
+                    <div class="value" id="statCoins">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Bosses Defeated</h3>
+                    <div class="value" id="statBosses">0</div>
+                </div>
+            </div>
+            <button class="menu-button danger" onclick="resetProgress()">RESET ALL</button>
+            <button class="menu-button secondary" onclick="showScreen('leaderboard')">LEADERBOARD</button>
+            <button class="menu-button secondary" onclick="showScreen('mainMenu')">BACK</button>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="screen" id="leaderboard">
+            <h1>LEADERBOARD</h1>
+            <p class="subtitle">Top 10 High Scores</p>
+            <div id="leaderboardList" style="margin: 30px 0;"></div>
+            <button class="menu-button secondary" onclick="showScreen('stats')">STATS</button>
+            <button class="menu-button secondary" onclick="showScreen('mainMenu')">BACK</button>
+        </div>
+
+        <!-- Victory Screen -->
+        <div class="screen" id="victoryScreen">
+            <h1 style="color: #ffd700; font-size: 96px; animation: glow 1s ease-in-out infinite;">VICTORY!</h1>
+            <p class="subtitle" style="font-size: 32px; color: #00ff88;">BOSS DEFEATED</p>
+            <div class="stats-grid" style="margin-top: 40px;">
+                <div class="stat-box">
+                    <h3>Score</h3>
+                    <div class="value" id="victoryScore">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Coins Earned</h3>
+                    <div class="value" id="victoryCoins">0</div>
+                </div>
+            </div>
+            <p style="color: #fff; font-size: 24px; margin-top: 40px;">Congratulations, Space Commander!</p>
+        </div>
+
+        <!-- Game Over -->
+        <div class="screen" id="gameOver">
+            <h1 id="gameOverTitle">GAME OVER</h1>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3>Score</h3>
+                    <div class="value" id="finalScore">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Coins Earned</h3>
+                    <div class="value" id="coinsEarned">0</div>
+                </div>
+            </div>
+            <button class="menu-button" onclick="startGame()">PLAY AGAIN</button>
+            <button class="menu-button secondary" onclick="showScreen('mainMenu')">MAIN MENU</button>
+        </div>
+
+        <!-- Name Input Modal -->
+        <div class="name-input-modal" id="nameInputModal">
+            <div class="name-input-box">
+                <h2>NEW HIGH SCORE!</h2>
+                <p style="color: #fff; font-size: 18px; margin-bottom: 20px;">
+                    Score: <span id="highScoreValue" style="color: #ffd700; font-weight: bold;">0</span>
+                </p>
+                <input type="text" id="playerNameInput" placeholder="Enter your name" maxlength="20" />
+                <br>
+                <button class="menu-button" onclick="submitHighScore()">SUBMIT</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game state
+        let gameState = {
+            isRunning: false,
+            isPaused: false,
+            mode: 'normal',
+            score: 0,
+            coinsThisRun: 0,
+            totalKills: 0,
+            startTime: 0,
+            pauseStartTime: 0,
+            totalPauseTime: 0,
+            gameTime: 0,
+            bossActive: false,
+            bossDefeated: false,
+            showingVictory: false
+        };
+
+        // Player data (persisted)
+        let playerData = {
+            coins: 0,
+            highScore: 0,
+            gamesPlayed: 0,
+            totalKills: 0,
+            bossesDefeated: 0,
+            unlockedModes: ['normal', 'hard', 'expert'],
+            unlockedAbilities: [], // Abilities unlocked in shop
+            upgrades: {
+                damage: 1,
+                fireRate: 1,
+                speed: 1,
+                health: 1
+            },
+            currentShip: 'default',
+            leaderboard: [] // Array of {name, score, mode, date}
+        };
+
+        // Game objects
+        let player = {
+            x: 375,
+            y: 500,
+            width: 30,
+            height: 30,
+            speed: 5,
+            color: '#00ff88',
+            health: 3,
+            maxHealth: 3,
+            damage: 1,
+            fireRate: 250,
+            lastShot: 0
+        };
+
+        let boss = null;
+        let asteroids = [];
+        let bullets = [];
+        let powerUpItems = [];
+        let particles = [];
+        let stars = [];
+        let activePowerUps = {};
+        let asteroidSpawner = null;
+        let bossTimer = null;
+
+        // Game configuration by mode
+        const modeConfig = {
+            normal: {
+                asteroidSpawnRate: 1500,
+                asteroidSpeed: 2,
+                bossTime: 180000, // 3 minutes
+                coinMultiplier: 1,
+                bossHealth: 250,
+                bossShootInterval: 1200
+            },
+            hard: {
+                asteroidSpawnRate: 1000,
+                asteroidSpeed: 3,
+                bossTime: 180000, // 3 minutes (FIXED - was 180 instead of 180000)
+                coinMultiplier: 2,
+                bossHealth: 400,
+                bossShootInterval: 1000
+            },
+            expert: {
+                asteroidSpawnRate: 800,
+                asteroidSpeed: 4,
+                bossTime: 180000, // 3 minutes (FIXED - was 180 instead of 180000)
+                coinMultiplier: 3,
+                bossHealth: 600,
+                bossShootInterval: 800
+            }
+        };
+
+        // Power-up types (including new ones for boss fights)
+        const powerUpTypes = {
+            // Temporary power-ups (from star asteroids)
+            SHIELD: { name: 'Shield', color: '#00ffff', duration: 10000, permanent: false },
+            RAPID_FIRE: { name: 'Rapid Fire', color: '#ff00ff', duration: 8000, permanent: false },
+            MULTI_SHOT: { name: 'Multi Shot', color: '#ff9900', duration: 10000, permanent: false },
+            NUKE: { name: 'Nuke', color: '#ff0000', duration: 0, permanent: false },
+            DAMAGE_BOOST: { name: 'Damage Boost', color: '#ffff00', duration: 12000, permanent: false },
+            FIRE_RATE_BOOST: { name: 'Fire Rate+', color: '#00ff00', duration: 12000, permanent: false },
+            HOMING_MISSILES: { name: 'Homing Missiles', color: '#ff1493', duration: 15000, permanent: false },
+            LASER_BEAM: { name: 'Laser Beam', color: '#00ff00', duration: 8000, permanent: false },
+            SCATTER_SHOT: { name: 'Scatter Shot', color: '#9370db', duration: 10000, permanent: false },
+            PIERCING_ROUNDS: { name: 'Piercing Rounds', color: '#87ceeb', duration: 12000, permanent: false },
+            EXPLOSIVE_ROUNDS: { name: 'Explosive Rounds', color: '#ff4500', duration: 10000, permanent: false },
+            SPEED_BOOST: { name: 'Speed Boost', color: '#7fff00', duration: 8000, permanent: false },
+            INVINCIBILITY: { name: 'Invincibility', color: '#ffd700', duration: 5000, permanent: false },
+            TIME_SLOW: { name: 'Time Slow', color: '#4169e1', duration: 10000, permanent: false },
+            COIN_MAGNET: { name: 'Coin Magnet', color: '#ffa500', duration: 15000, permanent: false },
+            
+            // NEW POWER-UPS
+            DOUBLE_SCORE: { name: 'Double Score', color: '#ffd700', duration: 15000, permanent: false },
+            ORBITAL_STRIKE: { name: 'Orbital Strike', color: '#ff0088', duration: 20000, permanent: false },
+            GHOST_MODE: { name: 'Ghost Mode', color: '#9400d3', duration: 6000, permanent: false },
+            CHAIN_LIGHTNING: { name: 'Chain Lightning', color: '#00bfff', duration: 12000, permanent: false },
+            MEGA_LASER: { name: 'Mega Laser', color: '#32cd32', duration: 10000, permanent: false },
+            BOOMERANG_SHOTS: { name: 'Boomerang Shots', color: '#ff69b4', duration: 12000, permanent: false },
+            FREEZE_TIME: { name: 'Freeze Time', color: '#00ced1', duration: 5000, permanent: false },
+            ASTEROID_RAIN: { name: 'Asteroid Rain', color: '#ff6347', duration: 15000, permanent: false },
+            VAMPIRE_SHOTS: { name: 'Vampire Shots', color: '#dc143c', duration: 10000, permanent: false },
+            TRIPLE_SIZE: { name: 'Triple Size', color: '#ff8c00', duration: 8000, permanent: false },
+            PLASMA_WAVE: { name: 'Plasma Wave', color: '#00ffaa', duration: 10000, permanent: false },
+            REFLECTOR_SHIELD: { name: 'Reflector Shield', color: '#silver', duration: 12000, permanent: false },
+            GRAVITY_WELL: { name: 'Gravity Well', color: '#8b00ff', duration: 15000, permanent: false },
+            FIRE_BULLETS: { name: 'Fire Bullets', color: '#ff4400', duration: 15000, permanent: false },
+            HEALTH_RESTORE: { name: 'Health Restore', color: '#ff1493', duration: 0, permanent: false },
+            
+            // PURCHASABLE POWER-UPS (must be unlocked in shop first)
+            ANNIHILATE: { name: 'Annihilate', color: '#ff0000', duration: 8000, permanent: false, cost: 5000, description: 'Massive explosion that destroys everything on screen' },
+            DOUBLE_SHOT: { name: 'Double Shot', color: '#00ddff', duration: 12000, permanent: false, cost: 3000, description: 'Fire two parallel bullet streams' },
+            STORM_BARRAGE: { name: 'Storm Barrage', color: '#4169e1', duration: 15000, permanent: false, cost: 4000, description: 'Unleash a barrage of bullets in all directions' },
+            TESLA_COIL: { name: 'Tesla Coil', color: '#00ffff', duration: 20000, permanent: false, cost: 6000, description: 'Continuous electric arcs damage all nearby enemies' },
+            PHOTON_TORPEDO: { name: 'Photon Torpedo', color: '#ff00ff', duration: 10000, permanent: false, cost: 4500, description: 'Powerful seeking torpedoes' },
+            MINIGUN: { name: 'Minigun', color: '#ff9900', duration: 12000, permanent: false, cost: 3500, description: 'Ultra rapid fire mode' },
+            BLACK_HOLE: { name: 'Black Hole', color: '#000088', duration: 8000, permanent: false, cost: 7000, description: 'Creates a black hole that sucks in and destroys asteroids' },
+            RAILGUN: { name: 'Railgun', color: '#00ffaa', duration: 10000, permanent: false, cost: 5000, description: 'Penetrating shots that pierce everything' },
+            QUANTUM_SHIELD: { name: 'Quantum Shield', color: '#ff00cc', duration: 15000, permanent: false, cost: 4000, description: 'Teleports away from danger automatically' },
+            VOID_MISSILES: { name: 'Void Missiles', color: '#440088', duration: 12000, permanent: false, cost: 5500, description: 'Dark energy missiles that erase targets' },
+            PULSAR_BEAM: { name: 'Pulsar Beam', color: '#ffff00', duration: 10000, permanent: false, cost: 4500, description: 'Pulsing energy beam with increased damage' },
+            SHOCKWAVE: { name: 'Shockwave', color: '#00ff99', duration: 8000, permanent: false, cost: 3000, description: 'Periodic shockwaves damage everything' },
+            PHASE_SHIFT: { name: 'Phase Shift', color: '#cc00ff', duration: 10000, permanent: false, cost: 3500, description: 'Bullets phase through obstacles and deal double damage' },
+            SINGULARITY: { name: 'Singularity', color: '#ff0088', duration: 6000, permanent: false, cost: 8000, description: 'Creates a singularity that obliterates a massive area' },
+            OMEGA_CANNON: { name: 'Omega Cannon', color: '#ff6600', duration: 15000, permanent: false, cost: 6000, description: 'Massive cannon shots with huge explosions' },
+            
+            // Permanent power-ups (from golden asteroids - last entire game)
+            PERM_SHIELD: { name: 'Eternal Shield', color: '#00ffff', duration: -1, permanent: true },
+            PERM_MULTI_SHOT: { name: 'Eternal Multi', color: '#ff9900', duration: -1, permanent: true },
+            PERM_DAMAGE: { name: 'Eternal Power', color: '#ffff00', duration: -1, permanent: true },
+            PERM_FIRE_RATE: { name: 'Eternal Speed', color: '#00ff00', duration: -1, permanent: true },
+            PERM_HOMING: { name: 'Eternal Homing', color: '#ff1493', duration: -1, permanent: true },
+            PERM_PIERCING: { name: 'Eternal Pierce', color: '#87ceeb', duration: -1, permanent: true },
+            PERM_LASER: { name: 'Eternal Laser', color: '#32cd32', duration: -1, permanent: true },
+            PERM_CHAIN: { name: 'Eternal Chain', color: '#00bfff', duration: -1, permanent: true },
+            PERM_EXPLOSIVE: { name: 'Eternal Blast', color: '#ff4500', duration: -1, permanent: true },
+            PERM_VAMPIRE: { name: 'Eternal Vampire', color: '#dc143c', duration: -1, permanent: true },
+            PERM_FIRE: { name: 'Eternal Fire', color: '#ff4400', duration: -1, permanent: true }
+        };
+
+        // Ship types
+        const ships = {
+            default: { name: 'Fighter', color: '#00ff88', speed: 1, damage: 1, health: 3, cost: 0 },
+            fast: { name: 'Interceptor', color: '#00ffff', speed: 1.5, damage: 0.8, health: 2, cost: 1000 },
+            tank: { name: 'Destroyer', color: '#ff6600', speed: 0.7, damage: 1.5, health: 5, cost: 1500 },
+            balanced: { name: 'Cruiser', color: '#ff00ff', speed: 1.2, damage: 1.2, health: 4, cost: 2000 }
+        };
+
+        // Upgrades
+        const upgrades = {
+            damage: { name: 'Damage', levels: [0, 500, 1000, 2000, 5000], maxLevel: 5 },
+            fireRate: { name: 'Fire Rate', levels: [0, 500, 1000, 2000, 5000], maxLevel: 5 },
+            speed: { name: 'Speed', levels: [0, 500, 1000, 2000, 5000], maxLevel: 5 },
+            health: { name: 'Health', levels: [0, 500, 1000, 2000, 5000], maxLevel: 5 }
+        };
+
+        // Input handling
+        const keys = {};
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            
+            if (e.key === ' ' && gameState.isRunning && !gameState.isPaused) {
+                e.preventDefault();
+                shoot();
+            }
+            
+            if (e.key === 'Escape' && gameState.isRunning) {
+                e.preventDefault();
+                togglePause();
+            }
+            
+            // Enter key for name input
+            if (e.key === 'Enter' && document.getElementById('nameInputModal').classList.contains('active')) {
+                submitHighScore();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        // Initialize
+        function initScreens() {
+            loadPlayerData();
+            updateAllCoins();
+            updateModeCards();
+            renderShop();
+            updateStats();
+            showScreen('mainMenu');
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if (screenId === 'mainMenu' || screenId === 'shop') {
+                updateAllCoins();
+            }
+            if (screenId === 'stats') {
+                updateStats();
+            }
+            if (screenId === 'leaderboard') {
+                displayLeaderboard();
+            }
+        }
+
+        function updateAllCoins() {
+            document.getElementById('menuCoins').textContent = playerData.coins;
+            document.getElementById('shopCoins').textContent = playerData.coins;
+        }
+
+        function updateModeCards() {
+            const hardMode = document.getElementById('hardMode');
+            const expertMode = document.getElementById('expertMode');
+            
+            // Ensure hard mode is always unlocked (you can change this back to require unlock)
+            if (playerData.unlockedModes.includes('hard')) {
+                hardMode.classList.remove('locked');
+                hardMode.onclick = () => startGame('hard');
+                const hardButton = hardMode.querySelector('button');
+                if (hardButton) {
+                    hardButton.disabled = false;
+                    hardButton.textContent = 'PLAY';
+                }
+            } else {
+                // Lock it if not unlocked
+                hardMode.classList.add('locked');
+                hardMode.onclick = null;
+                const hardButton = hardMode.querySelector('button');
+                if (hardButton) {
+                    hardButton.disabled = true;
+                    hardButton.textContent = 'LOCKED';
+                }
+            }
+            
+            if (playerData.unlockedModes.includes('expert')) {
+                expertMode.classList.remove('locked');
+                expertMode.onclick = () => startGame('expert');
+                const expertButton = expertMode.querySelector('button');
+                if (expertButton) {
+                    expertButton.disabled = false;
+                    expertButton.textContent = 'PLAY';
+                }
+            } else {
+                expertMode.classList.add('locked');
+                expertMode.onclick = null;
+                const expertButton = expertMode.querySelector('button');
+                if (expertButton) {
+                    expertButton.disabled = true;
+                    expertButton.textContent = 'LOCKED';
+                }
+            }
+        }
+
+        function switchShopTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('upgradesTab').style.display = tab === 'upgrades' ? 'grid' : 'none';
+            document.getElementById('shipsTab').style.display = tab === 'ships' ? 'grid' : 'none';
+            document.getElementById('abilitiesTab').style.display = tab === 'abilities' ? 'grid' : 'none';
+        }
+
+        function renderShop() {
+            // Render upgrades
+            const upgradesTab = document.getElementById('upgradesTab');
+            upgradesTab.innerHTML = '';
+            
+            for (let key in upgrades) {
+                const upgrade = upgrades[key];
+                const currentLevel = playerData.upgrades[key];
+                const nextCost = upgrade.levels[currentLevel];
+                const isMaxed = currentLevel >= upgrade.maxLevel;
+                
+                const item = document.createElement('div');
+                item.className = 'shop-item';
+                item.innerHTML = `
+                    <h3>${upgrade.name}</h3>
+                    <p>Level ${currentLevel}/${upgrade.maxLevel}</p>
+                    <div class="price">${isMaxed ? 'MAXED' : nextCost + ' 💰'}</div>
+                    <button class="menu-button" ${isMaxed ? 'disabled' : ''} 
+                        onclick="buyUpgrade('${key}')">
+                        ${isMaxed ? 'MAXED' : 'UPGRADE'}
+                    </button>
+                `;
+                upgradesTab.appendChild(item);
+            }
+            
+            // Render ships
+            const shipsTab = document.getElementById('shipsTab');
+            shipsTab.innerHTML = '';
+            
+            for (let key in ships) {
+                const ship = ships[key];
+                const isOwned = key === 'default' || playerData.coins >= 0; // All available for now
+                const isCurrent = playerData.currentShip === key;
+                
+                const item = document.createElement('div');
+                item.className = 'shop-item';
+                item.innerHTML = `
+                    <h3>${ship.name}</h3>
+                    <p>Speed: ${ship.speed}x | Damage: ${ship.damage}x | HP: ${ship.health}</p>
+                    <div class="price">${ship.cost === 0 ? 'FREE' : ship.cost + ' 💰'}</div>
+                    <button class="menu-button" ${isCurrent ? 'disabled' : ''} 
+                        onclick="buyShip('${key}')">
+                        ${isCurrent ? 'EQUIPPED' : ship.cost === 0 || playerData.coins >= ship.cost ? 'SELECT' : 'LOCKED'}
+                    </button>
+                `;
+                shipsTab.appendChild(item);
+            }
+            
+            // Render abilities
+            const abilitiesTab = document.getElementById('abilitiesTab');
+            abilitiesTab.innerHTML = '';
+            
+            const purchasableAbilities = ['ANNIHILATE', 'DOUBLE_SHOT', 'STORM_BARRAGE', 'TESLA_COIL', 
+                                          'PHOTON_TORPEDO', 'MINIGUN', 'BLACK_HOLE', 'RAILGUN',
+                                          'QUANTUM_SHIELD', 'VOID_MISSILES', 'PULSAR_BEAM', 'SHOCKWAVE',
+                                          'PHASE_SHIFT', 'SINGULARITY', 'OMEGA_CANNON'];
+            
+            for (let abilityKey of purchasableAbilities) {
+                const ability = powerUpTypes[abilityKey];
+                const isUnlocked = playerData.unlockedAbilities.includes(abilityKey);
+                
+                const item = document.createElement('div');
+                item.className = 'shop-item';
+                item.innerHTML = `
+                    <h3>${ability.name}</h3>
+                    <p style="font-size: 12px; color: #aaa;">${ability.description}</p>
+                    <div class="price">${ability.cost} 💰</div>
+                    <button class="menu-button" ${isUnlocked ? 'disabled' : ''} 
+                        onclick="buyAbility('${abilityKey}')">
+                        ${isUnlocked ? 'UNLOCKED' : playerData.coins >= ability.cost ? 'UNLOCK' : 'LOCKED'}
+                    </button>
+                `;
+                abilitiesTab.appendChild(item);
+            }
+        }
+
+        function buyUpgrade(type) {
+            const upgrade = upgrades[type];
+            const currentLevel = playerData.upgrades[type];
+            const cost = upgrade.levels[currentLevel];
+            
+            if (currentLevel >= upgrade.maxLevel) return;
+            if (playerData.coins < cost) return;
+            
+            playerData.coins -= cost;
+            playerData.upgrades[type]++;
+            savePlayerData();
+            updateAllCoins();
+            renderShop();
+        }
+
+        function buyShip(type) {
+            const ship = ships[type];
+            if (playerData.coins < ship.cost && ship.cost > 0) return;
+            
+            if (ship.cost > 0) {
+                playerData.coins -= ship.cost;
+            }
+            playerData.currentShip = type;
+            savePlayerData();
+            updateAllCoins();
+            renderShop();
+        }
+
+        function buyAbility(abilityKey) {
+            const ability = powerUpTypes[abilityKey];
+            if (playerData.unlockedAbilities.includes(abilityKey)) return;
+            if (playerData.coins < ability.cost) return;
+            
+            playerData.coins -= ability.cost;
+            playerData.unlockedAbilities.push(abilityKey);
+            savePlayerData();
+            updateAllCoins();
+            renderShop();
+        }
+
+        function updateStats() {
+            document.getElementById('statHighScore').textContent = playerData.highScore;
+            document.getElementById('statGames').textContent = playerData.gamesPlayed;
+            document.getElementById('statKills').textContent = playerData.totalKills;
+            document.getElementById('statCoins').textContent = playerData.coins;
+            document.getElementById('statBosses').textContent = playerData.bossesDefeated;
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone!')) {
+                localStorage.removeItem('spaceShooterData');
+                location.reload();
+            }
+        }
+
+        function loadPlayerData() {
+            const saved = localStorage.getItem('spaceShooterData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                playerData = { ...playerData, ...data };
+            }
+        }
+
+        function savePlayerData() {
+            localStorage.setItem('spaceShooterData', JSON.stringify(playerData));
+        }
+
+        function startGame(mode = null) {
+            if (mode) gameState.mode = mode;
+            
+            // Reset game state
+            gameState.isRunning = true;
+            gameState.isPaused = false;
+            gameState.score = 0;
+            gameState.coinsThisRun = 0;
+            gameState.totalKills = 0;
+            gameState.startTime = Date.now();
+            gameState.pauseStartTime = 0;
+            gameState.totalPauseTime = 0;
+            gameState.bossActive = false;
+            gameState.bossDefeated = false;
+            
+            // Reset game objects
+            asteroids = [];
+            bullets = [];
+            powerUpItems = [];
+            particles = [];
+            activePowerUps = {};
+            boss = null;
+            
+            // Setup player
+            const ship = ships[playerData.currentShip];
+            player.x = 375;
+            player.y = 500;
+            player.health = ship.health + playerData.upgrades.health;
+            player.maxHealth = ship.health + playerData.upgrades.health;
+            player.speed = 5 * ship.speed * (1 + playerData.upgrades.speed * 0.1);
+            player.damage = ship.damage * (1 + playerData.upgrades.damage * 0.2);
+            player.fireRate = 250 / (1 + playerData.upgrades.fireRate * 0.2);
+            player.color = ship.color;
+            player.lastShot = 0;
+            
+            // Hide screens and show game
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            canvas.style.display = 'block';
+            document.getElementById('hud').style.display = 'block';
+            document.getElementById('instructions').style.display = 'block';
+            
+            updateHUD();
+            
+            // Start spawning
+            const config = modeConfig[gameState.mode];
+            asteroidSpawner = setInterval(spawnAsteroid, config.asteroidSpawnRate);
+            
+            // Schedule boss
+            bossTimer = setTimeout(() => {
+                spawnBoss();
+            }, config.bossTime);
+        }
+
+        function spawnAsteroid() {
+            if (gameState.bossActive) return; // No asteroids during boss fight
+            
+            const config = modeConfig[gameState.mode];
+            
+            // Determine asteroid type with rarity
+            let asteroidType = 'normal';
+            const rand = Math.random();
+            
+            if (rand < 0.010) { // 0.5% chance for golden asteroid (very rare)
+                asteroidType = 'golden';
+            } else if (rand < 0.20) { // 15% chance for star asteroid
+                asteroidType = 'star';
+            }
+            
+            const asteroid = {
+                x: Math.random() * (canvas.width - 50),
+                y: -50,
+                width: asteroidType === 'golden' ? 70 : asteroidType === 'star' ? 60 : 40,
+                height: asteroidType === 'golden' ? 70 : asteroidType === 'star' ? 60 : 40,
+                speed: config.asteroidSpeed * (asteroidType === 'golden' ? 0.5 : asteroidType === 'star' ? 0.7 : 1),
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.1,
+                color: asteroidType === 'golden' ? '#ffd700' : asteroidType === 'star' ? '#9999ff' : '#888',
+                sides: 6,
+                special: asteroidType === 'star',
+                golden: asteroidType === 'golden',
+                health: (asteroidType === 'golden' ? 5 : asteroidType === 'star' ? 3 : 1) * 
+                        (gameState.mode === 'expert' ? 3 : gameState.mode === 'hard' ? 2 : 1),
+                maxHealth: (asteroidType === 'golden' ? 5 : asteroidType === 'star' ? 3 : 1) * 
+                           (gameState.mode === 'expert' ? 3 : gameState.mode === 'hard' ? 2 : 1),
+                value: asteroidType === 'golden' ? 100 : asteroidType === 'star' ? 50 : 10
+            };
+            
+            asteroids.push(asteroid);
+        }
+
+        function spawnBoss() {
+            const config = modeConfig[gameState.mode];
+            gameState.bossActive = true;
+            
+            // Show warning
+            const warning = document.getElementById('bossWarning');
+            warning.style.display = 'block';
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 2000);
+            
+            // Clear asteroids
+            asteroids = [];
+            clearInterval(asteroidSpawner);
+            
+            // Create boss
+            boss = {
+                x: canvas.width / 2 - 75,
+                y: -150,
+                width: 150,
+                height: 150,
+                speed: 1,
+                targetY: 100,
+                health: config.bossHealth,
+                maxHealth: config.bossHealth,
+                lastShot: 0,
+                shootInterval: config.bossShootInterval,
+                phase: 1
+            };
+        }
+
+        function shoot() {
+            const now = Date.now();
+            let fireRate = player.fireRate;
+            
+            // Fire rate boost power-up (temporary or permanent)
+            if ((activePowerUps.FIRE_RATE_BOOST && now < activePowerUps.FIRE_RATE_BOOST) ||
+                activePowerUps.PERM_FIRE_RATE === Infinity) {
+                // Permanent: 30% boost (0.7x), Temporary: 50% boost (0.5x)
+                fireRate *= activePowerUps.PERM_FIRE_RATE === Infinity ? 0.7 : 0.5;
+            }
+            
+            // Rapid fire power-up (temporary only)
+            if (activePowerUps.RAPID_FIRE && now < activePowerUps.RAPID_FIRE) {
+                fireRate *= 0.3;
+            }
+            
+            if (now - player.lastShot < fireRate) return;
+            player.lastShot = now;
+            
+            let damage = player.damage;
+            
+            // Damage boost power-up (temporary or permanent)
+            if ((activePowerUps.DAMAGE_BOOST && now < activePowerUps.DAMAGE_BOOST) ||
+                activePowerUps.PERM_DAMAGE === Infinity) {
+                // Permanent: 50% boost (1.5x), Temporary: 100% boost (2x)
+                damage *= activePowerUps.PERM_DAMAGE === Infinity ? 1.5 : 2;
+            }
+            
+            // Check active weapon types
+            const hasMultiShot = (activePowerUps.MULTI_SHOT && now < activePowerUps.MULTI_SHOT) ||
+                                activePowerUps.PERM_MULTI_SHOT === Infinity;
+            const hasScatter = activePowerUps.SCATTER_SHOT && now < activePowerUps.SCATTER_SHOT;
+            const hasLaser = (activePowerUps.LASER_BEAM && now < activePowerUps.LASER_BEAM) ||
+                            activePowerUps.PERM_LASER === Infinity;
+            const hasHoming = (activePowerUps.HOMING_MISSILES && now < activePowerUps.HOMING_MISSILES) ||
+                             activePowerUps.PERM_HOMING === Infinity;
+            const hasPiercing = (activePowerUps.PIERCING_ROUNDS && now < activePowerUps.PIERCING_ROUNDS) ||
+                               activePowerUps.PERM_PIERCING === Infinity;
+            const hasExplosive = (activePowerUps.EXPLOSIVE_ROUNDS && now < activePowerUps.EXPLOSIVE_ROUNDS) ||
+                                activePowerUps.PERM_EXPLOSIVE === Infinity;
+            const hasFire = (activePowerUps.FIRE_BULLETS && now < activePowerUps.FIRE_BULLETS) ||
+                           activePowerUps.PERM_FIRE === Infinity;
+            const hasMegaLaser = activePowerUps.MEGA_LASER && now < activePowerUps.MEGA_LASER;
+            const hasBoomerang = activePowerUps.BOOMERANG_SHOTS && now < activePowerUps.BOOMERANG_SHOTS;
+            const hasChainLightning = (activePowerUps.CHAIN_LIGHTNING && now < activePowerUps.CHAIN_LIGHTNING) ||
+                                     activePowerUps.PERM_CHAIN === Infinity;
+            const hasPlasmaWave = activePowerUps.PLASMA_WAVE && now < activePowerUps.PLASMA_WAVE;
+            
+            // NEW PURCHASABLE ABILITIES
+            const hasDoubleShot = activePowerUps.DOUBLE_SHOT && now < activePowerUps.DOUBLE_SHOT;
+            const hasStormBarrage = activePowerUps.STORM_BARRAGE && now < activePowerUps.STORM_BARRAGE;
+            const hasPhotonTorpedo = activePowerUps.PHOTON_TORPEDO && now < activePowerUps.PHOTON_TORPEDO;
+            const hasMinigun = activePowerUps.MINIGUN && now < activePowerUps.MINIGUN;
+            const hasRailgun = activePowerUps.RAILGUN && now < activePowerUps.RAILGUN;
+            const hasVoidMissiles = activePowerUps.VOID_MISSILES && now < activePowerUps.VOID_MISSILES;
+            const hasPulsarBeam = activePowerUps.PULSAR_BEAM && now < activePowerUps.PULSAR_BEAM;
+            const hasPhaseShift = activePowerUps.PHASE_SHIFT && now < activePowerUps.PHASE_SHIFT;
+            const hasOmegaCannon = activePowerUps.OMEGA_CANNON && now < activePowerUps.OMEGA_CANNON;
+            
+            // Minigun - fire rate override
+            if (hasMinigun && now - player.lastShot < 50) return; // Ultra fast firing
+            
+            // Omega Cannon (massive slow shots)
+            if (hasOmegaCannon) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 25,
+                    y: player.y,
+                    width: 50,
+                    height: 80,
+                    speed: 6,
+                    damage: damage * 5,
+                    isOmegaCannon: true
+                });
+            }
+            // Railgun (penetrating beam)
+            else if (hasRailgun) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 4,
+                    y: player.y,
+                    width: 8,
+                    height: canvas.height,
+                    speed: 0,
+                    damage: damage * 2,
+                    isRailgun: true,
+                    isPiercing: true,
+                    life: 1
+                });
+            }
+            // Pulsar Beam (pulsing beam)
+            else if (hasPulsarBeam) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 12,
+                    y: player.y,
+                    width: 24,
+                    height: canvas.height,
+                    speed: 0,
+                    damage: damage * 1.5,
+                    isPulsarBeam: true,
+                    life: 2,
+                    pulsePhase: 0
+                });
+            }
+            // Void Missiles (dark energy)
+            else if (hasVoidMissiles) {
+                for (let i = -1; i <= 1; i++) {
+                    bullets.push({
+                        x: player.x + player.width / 2 - 6,
+                        y: player.y,
+                        width: 12,
+                        height: 25,
+                        speed: 12,
+                        damage: damage * 1.8,
+                        isVoidMissile: true,
+                        vx: i * 0.5,
+                        isHoming: true
+                    });
+                }
+            }
+            // Photon Torpedo (powerful homing)
+            else if (hasPhotonTorpedo) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 8,
+                    y: player.y,
+                    width: 16,
+                    height: 30,
+                    speed: 10,
+                    damage: damage * 2.5,
+                    isPhotonTorpedo: true,
+                    isHoming: true
+                });
+            }
+            // Double Shot (two parallel streams)
+            else if (hasDoubleShot) {
+                bullets.push(
+                    { x: player.x - 5, y: player.y, width: 4, height: 15, speed: 10, damage, vx: 0, isDoubleShot: true },
+                    { x: player.x + player.width + 5, y: player.y, width: 4, height: 15, speed: 10, damage, vx: 0, isDoubleShot: true }
+                );
+            }
+            // Storm Barrage (bullets in all directions)
+            else if (hasStormBarrage) {
+                for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
+                    bullets.push({
+                        x: player.x + player.width / 2,
+                        y: player.y + player.height / 2,
+                        width: 6,
+                        height: 12,
+                        speed: 8,
+                        damage: damage * 0.6,
+                        isStormBarrage: true,
+                        vx: Math.cos(angle) * 8,
+                        vy: Math.sin(angle) * 8
+                    });
+                }
+            }
+            // Mega Laser (ultra wide devastating beam)
+            else if (hasMegaLaser) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 40,
+                    y: player.y,
+                    width: 80,
+                    height: 600,
+                    speed: 0,
+                    damage: damage * 2,
+                    isLaser: true,
+                    isMegaLaser: true,
+                    life: 3
+                });
+            }
+            // Plasma Wave (expanding circle wave)
+            else if (hasPlasmaWave) {
+                bullets.push({
+                    x: player.x + player.width / 2,
+                    y: player.y,
+                    width: 20,
+                    height: 20,
+                    speed: 0,
+                    damage: damage * 0.7,
+                    isPlasmaWave: true,
+                    radius: 10,
+                    maxRadius: 150
+                });
+            }
+            // Chain Lightning (arcing electricity)
+            else if (hasChainLightning) {
+                const chainDamage = activePowerUps.PERM_CHAIN === Infinity ? damage * 1.2 : damage * 1.5;
+                const chainCount = activePowerUps.PERM_CHAIN === Infinity ? 2 : 3;
+                bullets.push({
+                    x: player.x + player.width / 2 - 3,
+                    y: player.y,
+                    width: 6,
+                    height: 20,
+                    speed: 12,
+                    damage: chainDamage,
+                    isChainLightning: true,
+                    chainCount: chainCount
+                });
+            }
+            // Boomerang shots (come back)
+            else if (hasBoomerang) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 3,
+                    y: player.y,
+                    width: 6,
+                    height: 12,
+                    speed: 8,
+                    damage: damage * 0.8,
+                    isBoomerang: true,
+                    phase: 'out',
+                    maxY: 0
+                });
+            }
+            // Laser beam (wide continuous beam - permanent is thinner)
+            else if (hasLaser) {
+                const laserWidth = activePowerUps.PERM_LASER === Infinity ? 15 : 20;
+                const laserDamage = activePowerUps.PERM_LASER === Infinity ? damage * 0.4 : damage * 0.5;
+                bullets.push({
+                    x: player.x + player.width / 2 - laserWidth / 2,
+                    y: player.y,
+                    width: laserWidth,
+                    height: 600,
+                    speed: 0,
+                    damage: laserDamage,
+                    isLaser: true,
+                    life: 2
+                });
+            }
+            // Scatter shot (5 bullets in spread)
+            else if (hasScatter) {
+                for (let i = -2; i <= 2; i++) {
+                    bullets.push({
+                        x: player.x + player.width / 2 - 2,
+                        y: player.y,
+                        width: 4,
+                        height: 15,
+                        speed: 10,
+                        damage,
+                        vx: i * 1.5,
+                        isPiercing: hasPiercing,
+                        isExplosive: hasExplosive,
+                        isFire: hasFire
+                    });
+                }
+            }
+            // Multi-shot (3 bullets for temp, 2 for permanent)
+            else if (hasMultiShot) {
+                if (activePowerUps.PERM_MULTI_SHOT === Infinity) {
+                    // Permanent multi-shot: 2 bullets
+                    bullets.push(
+                        { x: player.x, y: player.y, width: 4, height: 15, speed: 10, damage, vx: -0.8, isHoming: hasHoming, isPiercing: hasPiercing, isExplosive: hasExplosive, isFire: hasFire },
+                        { x: player.x + player.width, y: player.y, width: 4, height: 15, speed: 10, damage, vx: 0.8, isHoming: hasHoming, isPiercing: hasPiercing, isExplosive: hasExplosive, isFire: hasFire }
+                    );
+                } else {
+                    // Temporary multi-shot: 3 bullets
+                    bullets.push(
+                        { x: player.x + player.width / 2 - 2, y: player.y, width: 4, height: 15, speed: 10, damage, vx: 0, isHoming: hasHoming, isPiercing: hasPiercing, isExplosive: hasExplosive, isFire: hasFire },
+                        { x: player.x, y: player.y, width: 4, height: 15, speed: 10, damage, vx: -1, isHoming: hasHoming, isPiercing: hasPiercing, isExplosive: hasExplosive, isFire: hasFire },
+                        { x: player.x + player.width, y: player.y, width: 4, height: 15, speed: 10, damage, vx: 1, isHoming: hasHoming, isPiercing: hasPiercing, isExplosive: hasExplosive, isFire: hasFire }
+                    );
+                }
+            }
+            // Standard shot
+            else {
+                bullets.push({
+                    x: player.x + player.width / 2 - 2,
+                    y: player.y,
+                    width: 4,
+                    height: 15,
+                    speed: 10,
+                    damage,
+                    vx: 0,
+                    isHoming: hasHoming,
+                    isPiercing: hasPiercing,
+                    isExplosive: hasExplosive,
+                    isFire: hasFire
+                });
+            }
+        }
+
+        function togglePause() {
+            if (gameState.isPaused) {
+                // Resuming - add the pause duration to total
+                gameState.totalPauseTime += Date.now() - gameState.pauseStartTime;
+                gameState.pauseStartTime = 0;
+            } else {
+                // Pausing - record when pause started
+                gameState.pauseStartTime = Date.now();
+            }
+            gameState.isPaused = !gameState.isPaused;
+        }
+
+        function updateHUD() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('coins').textContent = gameState.coinsThisRun;
+            
+            const elapsed = gameState.bossActive ? 
+                modeConfig[gameState.mode].bossTime : 
+                Date.now() - gameState.startTime - gameState.totalPauseTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            document.getElementById('timer').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function update() {
+            if (!gameState.isRunning || gameState.isPaused) return;
+            
+            updateHUD();
+            
+            // Update stars
+            stars.forEach(star => {
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+            
+            // Player movement
+            const now = Date.now();
+            let moveSpeed = player.speed;
+            
+            // Speed boost
+            if (activePowerUps.SPEED_BOOST && now < activePowerUps.SPEED_BOOST) {
+                moveSpeed *= 1.5;
+            }
+            
+            if ((keys['ArrowLeft'] || keys['a']) && player.x > 0) {
+                player.x -= moveSpeed;
+            }
+            if ((keys['ArrowRight'] || keys['d']) && player.x < canvas.width - player.width) {
+                player.x += moveSpeed;
+            }
+            if ((keys['ArrowUp'] || keys['w']) && player.y > 0) {
+                player.y -= moveSpeed;
+            }
+            if ((keys['ArrowDown'] || keys['s']) && player.y < canvas.height - player.height) {
+                player.y += moveSpeed;
+            }
+            
+            // Update bullets
+            bullets = bullets.filter(bullet => {
+                // Handle plasma wave (expanding circle)
+                if (bullet.isPlasmaWave) {
+                    bullet.radius += 5;
+                    bullet.y -= 2;
+                    if (bullet.radius > bullet.maxRadius) return false;
+                }
+                // Handle boomerang shots
+                else if (bullet.isBoomerang) {
+                    if (bullet.phase === 'out') {
+                        bullet.y -= bullet.speed;
+                        if (bullet.y < bullet.maxY) {
+                            bullet.maxY = bullet.y;
+                        }
+                        if (bullet.y < 50) {
+                            bullet.phase = 'back';
+                        }
+                    } else {
+                        // Come back to player
+                        const angle = Math.atan2(player.y - bullet.y, player.x - bullet.x);
+                        bullet.x += Math.cos(angle) * 10;
+                        bullet.y += Math.sin(angle) * 10;
+                        if (Math.hypot(player.x - bullet.x, player.y - bullet.y) < 30) {
+                            return false; // Collected
+                        }
+                    }
+                }
+                // Handle chain lightning
+                else if (bullet.isChainLightning) {
+                    bullet.y -= bullet.speed;
+                    if (bullet.vx) bullet.x += bullet.vx;
+                }
+                // Handle homing missiles
+                else if (bullet.isHoming && asteroids.length > 0) {
+                    let closest = null;
+                    let closestDist = Infinity;
+                    asteroids.forEach(asteroid => {
+                        if (asteroid.isBossProjectile) return;
+                        const dist = Math.hypot(asteroid.x - bullet.x, asteroid.y - bullet.y);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            closest = asteroid;
+                        }
+                    });
+                    
+                    if (closest && closestDist < 300) {
+                        const angle = Math.atan2(closest.y - bullet.y, closest.x - bullet.x);
+                        bullet.x += Math.cos(angle) * 8;
+                        bullet.y += Math.sin(angle) * 8;
+                    } else {
+                        bullet.y -= bullet.speed;
+                        if (bullet.vx) bullet.x += bullet.vx;
+                    }
+                } else if (bullet.isLaser || bullet.isMegaLaser) {
+                    // Laser beams stay in place briefly
+                    bullet.life--;
+                    if (bullet.life <= 0) return false;
+                } else {
+                    bullet.y -= bullet.speed;
+                    if (bullet.vx) bullet.x += bullet.vx;
+                }
+                
+                return bullet.y > -bullet.height && bullet.x > -50 && bullet.x < canvas.width + 50;
+            });
+            
+            // Update boss
+            if (boss) {
+                // Move to position
+                if (boss.y < boss.targetY) {
+                    boss.y += boss.speed;
+                }
+                
+                // Boss shooting - ALWAYS shoots 3 projectiles at player's current position
+                const now = Date.now();
+                if (now - boss.lastShot > boss.shootInterval) {
+                    boss.lastShot = now;
+                    // Boss shoots 3 bullets aimed at player's current position
+                    for (let i = -1; i <= 1; i++) {
+                        const startX = boss.x + boss.width / 2 + i * 30;
+                        const startY = boss.y + boss.height;
+                        
+                        // Calculate angle to player
+                        const angle = Math.atan2(player.y - startY, player.x - startX);
+                        const projectileSpeed = 4;
+                        
+                        asteroids.push({
+                            x: startX,
+                            y: startY,
+                            width: 20,
+                            height: 20,
+                            speed: projectileSpeed,
+                            vx: Math.cos(angle) * projectileSpeed,
+                            vy: Math.sin(angle) * projectileSpeed,
+                            rotation: 0,
+                            rotationSpeed: 0.1,
+                            color: '#ff0000',
+                            sides: 4,
+                            special: false,
+                            health: 1,
+                            maxHealth: 1,
+                            value: 0,
+                            isBossProjectile: true,
+                            canBounce: Math.random() < 0.5, // 50% chance to bounce
+                            bounceCount: 0 // Track number of bounces
+                        });
+                    }
+                }
+                
+                // Check bullet collisions with boss
+                bullets = bullets.filter(bullet => {
+                    if (checkCollision(bullet, boss)) {
+                        boss.health -= bullet.damage;
+                        createExplosion(bullet.x, bullet.y, '#ffff00');
+                        
+                        if (boss.health <= 0) {
+                            // Boss defeated!
+                            gameState.bossDefeated = true;
+                            const config = modeConfig[gameState.mode];
+                            const bossReward = 500 * config.coinMultiplier;
+                            gameState.coinsThisRun += bossReward;
+                            gameState.score += 5000;
+                            playerData.bossesDefeated++;
+                            
+                            // Create massive explosion effect
+                            for (let i = 0; i < 100; i++) {
+                                particles.push({
+                                    x: boss.x + boss.width / 2,
+                                    y: boss.y + boss.height / 2,
+                                    vx: (Math.random() - 0.5) * 15,
+                                    vy: (Math.random() - 0.5) * 15,
+                                    life: 1,
+                                    color: i % 3 === 0 ? '#ff0000' : i % 3 === 1 ? '#ff6600' : '#ffff00'
+                                });
+                            }
+                            
+                            // Store boss position for animation
+                            gameState.bossExplosionX = boss.x + boss.width / 2;
+                            gameState.bossExplosionY = boss.y + boss.height / 2;
+                            gameState.bossExplosionRadius = 0;
+                            gameState.bossExplosionMaxRadius = 200;
+                            
+                            // Show victory message
+                            gameState.showingVictory = true;
+                            boss = null;
+                            setTimeout(() => {
+                                gameState.showingVictory = false;
+                                endGame(true);
+                            }, 3000);
+                        }
+                        
+                        return false;
+                    }
+                    return true;
+                });
+            }
+            
+            // Update asteroids
+            asteroids = asteroids.filter(asteroid => {
+                const now = Date.now();
+                let asteroidSpeed = asteroid.speed;
+                
+                // Freeze Time effect - stops all asteroids
+                if (activePowerUps.FREEZE_TIME && now < activePowerUps.FREEZE_TIME) {
+                    asteroidSpeed = 0;
+                }
+                // Time slow effect
+                else if (activePowerUps.TIME_SLOW && now < activePowerUps.TIME_SLOW) {
+                    asteroidSpeed *= 0.3;
+                }
+                
+                // Gravity Well - pulls asteroids towards player
+                if (activePowerUps.GRAVITY_WELL && now < activePowerUps.GRAVITY_WELL) {
+                    const angle = Math.atan2(player.y - asteroid.y, player.x - asteroid.x);
+                    asteroid.x += Math.cos(angle) * 1;
+                    asteroid.y += Math.sin(angle) * 1;
+                }
+                
+                // Boss projectiles use velocity-based movement
+                if (asteroid.isBossProjectile && asteroid.vx !== undefined && asteroid.vy !== undefined) {
+                    asteroid.x += asteroid.vx;
+                    asteroid.y += asteroid.vy;
+                    
+                    // Handle bouncing off walls
+                    if (asteroid.canBounce && asteroid.bounceCount < 3) {
+                        // Bounce off left and right walls
+                        if (asteroid.x <= 0 || asteroid.x + asteroid.width >= canvas.width) {
+                            asteroid.vx *= -1;
+                            asteroid.x = asteroid.x <= 0 ? 0 : canvas.width - asteroid.width;
+                            asteroid.bounceCount++;
+                        }
+                        // Bounce off top wall
+                        if (asteroid.y <= 0) {
+                            asteroid.vy *= -1;
+                            asteroid.y = 0;
+                            asteroid.bounceCount++;
+                        }
+                    }
+                } else {
+                    // Regular asteroids use simple downward movement
+                    asteroid.y += asteroidSpeed;
+                }
+                
+                asteroid.rotation += asteroid.rotationSpeed;
+                
+                // Apply burning damage over time
+                if (asteroid.isBurning) {
+                    const burnInterval = 500; // Apply burn damage every 500ms
+                    if (now - asteroid.burnStartTime >= burnInterval * (6 - asteroid.burnTicks)) {
+                        asteroid.health -= asteroid.burnDamage;
+                        asteroid.burnTicks--;
+                        
+                        // Create fire particles
+                        particles.push({
+                            x: asteroid.x + Math.random() * asteroid.width,
+                            y: asteroid.y + Math.random() * asteroid.height,
+                            vx: (Math.random() - 0.5) * 2,
+                            vy: -Math.random() * 3,
+                            life: 0.5,
+                            color: Math.random() > 0.5 ? '#ff4400' : '#ff6600'
+                        });
+                        
+                        if (asteroid.burnTicks <= 0) {
+                            asteroid.isBurning = false;
+                        }
+                    }
+                }
+                
+                // Check collision with player
+                if (checkCollision(asteroid, player)) {
+                    // Ghost Mode - pass through asteroids
+                    if (activePowerUps.GHOST_MODE && now < activePowerUps.GHOST_MODE) {
+                        return true; // Keep asteroid, no damage
+                    }
+                    
+                    // Invincibility
+                    if (activePowerUps.INVINCIBILITY && now < activePowerUps.INVINCIBILITY) {
+                        createExplosion(asteroid.x, asteroid.y, asteroid.color);
+                        return false;
+                    }
+                    
+                    // Reflector Shield - bounces asteroids back
+                    if (activePowerUps.REFLECTOR_SHIELD && now < activePowerUps.REFLECTOR_SHIELD) {
+                        asteroid.speed *= -1.5;
+                        asteroid.y -= 20;
+                        createExplosion(asteroid.x, asteroid.y, '#silver');
+                        return true;
+                    }
+                    
+                    const hasShield = (activePowerUps.SHIELD && now < activePowerUps.SHIELD) ||
+                                    activePowerUps.PERM_SHIELD === Infinity;
+                                    activePowerUps.PERM_SHIELD === Infinity;
+                    
+                    // Check if shield blocks this hit
+                    // Temporary shield: 100% effective, Permanent shield: 80% effective
+                    const shieldBlocks = hasShield && 
+                        (activePowerUps.SHIELD && now < activePowerUps.SHIELD ? true : Math.random() > 0.2);
+                    
+                    if (shieldBlocks) {
+                        createExplosion(asteroid.x, asteroid.y, asteroid.color);
+                        return false;
+                    } else {
+                        player.health--;
+                        createExplosion(asteroid.x, asteroid.y, asteroid.color);
+                        if (player.health <= 0) {
+                            endGame(false);
+                        }
+                        return false;
+                    }
+                }
+                
+                return asteroid.y < canvas.height + 50;
+            });
+            
+            // Check bullet-asteroid collisions
+            bullets = bullets.filter(bullet => {
+                let bulletHit = false;
+                
+                asteroids = asteroids.filter(asteroid => {
+                    if (asteroid.isBossProjectile) return true; // Can't shoot boss projectiles
+                    
+                    // Check different collision types
+                    let hit = false;
+                    
+                    if (bullet.isPlasmaWave) {
+                        // Circular collision for plasma wave
+                        const dist = Math.hypot(bullet.x - (asteroid.x + asteroid.width/2), bullet.y - (asteroid.y + asteroid.height/2));
+                        hit = dist < bullet.radius + asteroid.width/2;
+                    } else if (bullet.isLaser || bullet.isMegaLaser) {
+                        // Laser beam collision
+                        hit = bullet.x < asteroid.x + asteroid.width && 
+                              bullet.x + bullet.width > asteroid.x && asteroid.y < canvas.height;
+                    } else {
+                        // Standard collision
+                        hit = checkCollision(bullet, asteroid);
+                    }
+                    
+                    if (hit) {
+                        asteroid.health -= bullet.damage;
+                        
+                        // Fire bullets apply burning damage over time
+                        if (bullet.isFire && !asteroid.isBurning) {
+                            asteroid.isBurning = true;
+                            asteroid.burnStartTime = Date.now();
+                            asteroid.burnDamage = bullet.damage * 0.3; // 30% of bullet damage per tick
+                            asteroid.burnTicks = 5; // Burns for 5 ticks
+                        }
+                        
+                        // Chain lightning jumps to nearby asteroids
+                        if (bullet.isChainLightning && bullet.chainCount > 0) {
+                            bullet.chainCount--;
+                            let nearest = null;
+                            let nearestDist = Infinity;
+                            asteroids.forEach(other => {
+                                if (other !== asteroid && !other.isBossProjectile) {
+                                    const dist = Math.hypot(other.x - asteroid.x, other.y - asteroid.y);
+                                    if (dist < 150 && dist < nearestDist) {
+                                        nearestDist = dist;
+                                        nearest = other;
+                                    }
+                                }
+                            });
+                            if (nearest && bullet.chainCount > 0) {
+                                nearest.health -= bullet.damage * 0.7;
+                                createExplosion(nearest.x, nearest.y, '#00bfff');
+                            }
+                        }
+                        
+                        if (!bullet.isPiercing && !bullet.isLaser && !bullet.isMegaLaser && !bullet.isPlasmaWave) {
+                            bulletHit = true;
+                        }
+                        
+                        if (asteroid.health <= 0) {
+                            gameState.score += asteroid.value;
+                            gameState.totalKills++;
+                            
+                            const config = modeConfig[gameState.mode];
+                            let coinReward = Math.ceil((asteroid.golden ? 10 : asteroid.special ? 5 : 1) * config.coinMultiplier);
+                            
+                            // Double score powerup
+                            const now = Date.now();
+                            if (activePowerUps.DOUBLE_SCORE && now < activePowerUps.DOUBLE_SCORE) {
+                                gameState.score += asteroid.value;
+                                coinReward *= 2;
+                            }
+                            
+                            // Vampire shots heal player
+                            if ((activePowerUps.VAMPIRE_SHOTS && now < activePowerUps.VAMPIRE_SHOTS) ||
+                                activePowerUps.PERM_VAMPIRE === Infinity) {
+                                if (player.health < player.maxHealth && Math.random() < 0.3) {
+                                    player.health++;
+                                }
+                            }
+                            
+                            gameState.coinsThisRun += coinReward;
+                            
+                            createExplosion(asteroid.x, asteroid.y, asteroid.color);
+                            
+                            // Explosive rounds damage nearby asteroids
+                            if (bullet.isExplosive) {
+                                asteroids.forEach(nearby => {
+                                    if (nearby !== asteroid && !nearby.isBossProjectile) {
+                                        const dist = Math.hypot(nearby.x - asteroid.x, nearby.y - asteroid.y);
+                                        if (dist < 100) {
+                                            nearby.health -= bullet.damage * 0.5;
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            // Golden asteroids always drop permanent power-ups
+                            if (asteroid.golden) {
+                                const permTypes = ['PERM_SHIELD', 'PERM_MULTI_SHOT', 'PERM_DAMAGE', 'PERM_FIRE_RATE', 'PERM_HOMING', 
+                                                   'PERM_PIERCING', 'PERM_LASER', 'PERM_CHAIN', 'PERM_EXPLOSIVE', 'PERM_VAMPIRE', 'PERM_FIRE'];
+                                const type = permTypes[Math.floor(Math.random() * permTypes.length)];
+                                powerUpItems.push({
+                                    x: asteroid.x + asteroid.width / 2 - 15,
+                                    y: asteroid.y + asteroid.height / 2 - 15,
+                                    width: 30,
+                                    height: 30,
+                                    type: type,
+                                    pulse: 0,
+                                    isPermanent: true
+                                });
+                            }
+                            // Star asteroids always drop temporary power-ups
+                            else if (asteroid.special) {
+                                const tempTypes = ['SHIELD', 'RAPID_FIRE', 'MULTI_SHOT', 'NUKE', 'DAMAGE_BOOST', 'FIRE_RATE_BOOST', 
+                                                   'HOMING_MISSILES', 'LASER_BEAM', 'SCATTER_SHOT', 'PIERCING_ROUNDS', 
+                                                   'EXPLOSIVE_ROUNDS', 'SPEED_BOOST', 'INVINCIBILITY', 'TIME_SLOW', 'COIN_MAGNET',
+                                                   'DOUBLE_SCORE', 'ORBITAL_STRIKE', 'GHOST_MODE', 'CHAIN_LIGHTNING', 'MEGA_LASER',
+                                                   'BOOMERANG_SHOTS', 'FREEZE_TIME', 'ASTEROID_RAIN', 'VAMPIRE_SHOTS', 'TRIPLE_SIZE',
+                                                   'PLASMA_WAVE', 'REFLECTOR_SHIELD', 'GRAVITY_WELL', 'FIRE_BULLETS', 'HEALTH_RESTORE'];
+                                
+                                // Add unlocked abilities to the pool
+                                const allAvailable = [...tempTypes, ...playerData.unlockedAbilities];
+                                const type = allAvailable[Math.floor(Math.random() * allAvailable.length)];
+                                
+                                powerUpItems.push({
+                                    x: asteroid.x + asteroid.width / 2 - 15,
+                                    y: asteroid.y + asteroid.height / 2 - 15,
+                                    width: 30,
+                                    height: 30,
+                                    type: type,
+                                    pulse: 0,
+                                    isPermanent: false
+                                });
+                            }
+                            
+                            return false;
+                        }
+                        
+                        if (!bullet.isPiercing && !bullet.isLaser) {
+                            createExplosion(bullet.x, bullet.y, '#ffff00');
+                        }
+                    }
+                    return true;
+                });
+                return !bulletHit && !bullet.isLaser;
+            });
+            
+            // Update power-ups
+            powerUpItems = powerUpItems.filter(item => {
+                item.y += 2;
+                item.pulse += 0.1;
+                
+                if (checkCollision(item, player)) {
+                    activatePowerUp(item.type);
+                    return false;
+                }
+                
+                return item.y < canvas.height;
+            });
+            
+            // Update particles
+            particles = particles.filter(particle => {
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.life -= 0.02;
+                return particle.life > 0;
+            });
+            
+            // Check for nuke
+            if (activePowerUps.NUKE_ACTIVE) {
+                asteroids.forEach(asteroid => {
+                    if (!asteroid.isBossProjectile) {
+                        gameState.score += asteroid.value;
+                        gameState.totalKills++;
+                        createExplosion(asteroid.x, asteroid.y, asteroid.color);
+                    }
+                });
+                asteroids = asteroids.filter(a => a.isBossProjectile);
+                delete activePowerUps.NUKE_ACTIVE;
+                updateHUD();
+            }
+            
+            // Orbital Strike - shoots from top every 2 seconds
+            if (activePowerUps.ORBITAL_STRIKE && now < activePowerUps.ORBITAL_STRIKE) {
+                if (!activePowerUps.ORBITAL_LAST || now - activePowerUps.ORBITAL_LAST > 2000) {
+                    activePowerUps.ORBITAL_LAST = now;
+                    // Fire 3 orbital strikes at random positions
+                    for (let i = 0; i < 3; i++) {
+                        bullets.push({
+                            x: Math.random() * (canvas.width - 20),
+                            y: -50,
+                            width: 20,
+                            height: 100,
+                            speed: 15,
+                            damage: player.damage * 3,
+                            isOrbital: true,
+                            vx: 0
+                        });
+                    }
+                }
+            }
+            
+            // Asteroid Rain - shoots friendly asteroids at enemies
+            if (activePowerUps.ASTEROID_RAIN && now < activePowerUps.ASTEROID_RAIN) {
+                if (!activePowerUps.RAIN_LAST || now - activePowerUps.RAIN_LAST > 1500) {
+                    activePowerUps.RAIN_LAST = now;
+                    // Drop friendly asteroids from top
+                    for (let i = 0; i < 2; i++) {
+                        bullets.push({
+                            x: Math.random() * (canvas.width - 30),
+                            y: -30,
+                            width: 30,
+                            height: 30,
+                            speed: 8,
+                            damage: player.damage * 2,
+                            isAsteroidRain: true,
+                            rotation: 0
+                        });
+                    }
+                }
+            }
+            
+            // Tesla Coil - constant electric arcs
+            if (activePowerUps.TESLA_COIL && now < activePowerUps.TESLA_COIL) {
+                if (!activePowerUps.TESLA_LAST || now - activePowerUps.TESLA_LAST > 300) {
+                    activePowerUps.TESLA_LAST = now;
+                    asteroids.forEach(asteroid => {
+                        const dist = Math.hypot(asteroid.x - player.x, asteroid.y - player.y);
+                        if (dist < 200 && !asteroid.isBossProjectile) {
+                            asteroid.health -= player.damage * 0.3;
+                            // Arc effect
+                            particles.push({
+                                x: (player.x + asteroid.x) / 2,
+                                y: (player.y + asteroid.y) / 2,
+                                vx: 0,
+                                vy: 0,
+                                life: 0.3,
+                                color: '#00ffff'
+                            });
+                        }
+                    });
+                }
+            }
+            
+            // Black Hole - sucks in and destroys
+            if (activePowerUps.BLACK_HOLE && now < activePowerUps.BLACK_HOLE) {
+                const bhX = canvas.width / 2;
+                const bhY = canvas.height / 3;
+                asteroids.forEach(asteroid => {
+                    if (!asteroid.isBossProjectile) {
+                        const dist = Math.hypot(asteroid.x - bhX, asteroid.y - bhY);
+                        if (dist < 150) {
+                            asteroid.health -= player.damage * 0.5;
+                        }
+                        if (dist < 300) {
+                            const angle = Math.atan2(bhY - asteroid.y, bhX - asteroid.x);
+                            asteroid.x += Math.cos(angle) * 3;
+                            asteroid.y += Math.sin(angle) * 3;
+                        }
+                    }
+                });
+            }
+            
+            // Shockwave - periodic pulses
+            if (activePowerUps.SHOCKWAVE && now < activePowerUps.SHOCKWAVE) {
+                if (!activePowerUps.SHOCKWAVE_LAST || now - activePowerUps.SHOCKWAVE_LAST > 2000) {
+                    activePowerUps.SHOCKWAVE_LAST = now;
+                    activePowerUps.SHOCKWAVE_RADIUS = 0;
+                }
+                if (activePowerUps.SHOCKWAVE_RADIUS !== undefined && activePowerUps.SHOCKWAVE_RADIUS < 300) {
+                    activePowerUps.SHOCKWAVE_RADIUS += 10;
+                    asteroids.forEach(asteroid => {
+                        const dist = Math.hypot(asteroid.x - player.x, asteroid.y - player.y);
+                        if (Math.abs(dist - activePowerUps.SHOCKWAVE_RADIUS) < 30 && !asteroid.isBossProjectile) {
+                            asteroid.health -= player.damage * 1.5;
+                        }
+                    });
+                }
+            }
+            
+            // Quantum Shield - auto teleport from danger
+            if (activePowerUps.QUANTUM_SHIELD && now < activePowerUps.QUANTUM_SHIELD) {
+                let dangerClose = false;
+                asteroids.forEach(asteroid => {
+                    const dist = Math.hypot(asteroid.x - player.x, asteroid.y - player.y);
+                    if (dist < 60) dangerClose = true;
+                });
+                if (dangerClose && (!activePowerUps.QUANTUM_LAST || now - activePowerUps.QUANTUM_LAST > 500)) {
+                    activePowerUps.QUANTUM_LAST = now;
+                    player.x = Math.random() * (canvas.width - player.width);
+                    // Teleport effect
+                    for (let i = 0; i < 20; i++) {
+                        particles.push({
+                            x: player.x + player.width / 2,
+                            y: player.y + player.height / 2,
+                            vx: (Math.random() - 0.5) * 10,
+                            vy: (Math.random() - 0.5) * 10,
+                            life: 0.5,
+                            color: '#ff00cc'
+                        });
+                    }
+                }
+            }
+            
+            // Singularity expanding void
+            if (activePowerUps.SINGULARITY && now < activePowerUps.SINGULARITY) {
+                const sing = activePowerUps.SINGULARITY_CENTER;
+                if (sing && sing.radius < sing.maxRadius) {
+                    sing.radius += 5;
+                    asteroids.forEach(asteroid => {
+                        const dist = Math.hypot(asteroid.x - sing.x, asteroid.y - sing.y);
+                        if (dist < sing.radius && !asteroid.isBossProjectile) {
+                            asteroid.health -= player.damage * 2;
+                        }
+                    });
+                }
+            }
+            
+            // Check if boss timer expired and boss not defeated
+            if (gameState.bossActive && boss && boss.y >= boss.targetY) {
+                const elapsed = Date.now() - gameState.startTime;
+                const bossTime = modeConfig[gameState.mode].bossTime;
+                if (elapsed > bossTime + 150000) { // Boss has 60 seconds
+                    endGame(false); // Player loses
+                }
+            }
+        }
+
+        function activatePowerUp(type) {
+            const power = powerUpTypes[type];
+            if (!power) return;
+            
+            // Health Restore - instant effect
+            if (type === 'HEALTH_RESTORE') {
+                const healAmount = Math.ceil(player.maxHealth * 0.25); // 25% of max health
+                player.health = Math.min(player.maxHealth, player.health + healAmount);
+                return;
+            }
+            
+            // Annihilate - instant massive explosion
+            if (type === 'ANNIHILATE') {
+                asteroids.forEach(asteroid => {
+                    if (!asteroid.isBossProjectile) {
+                        gameState.score += asteroid.value * 2; // Double points!
+                        gameState.totalKills++;
+                        createExplosion(asteroid.x, asteroid.y, '#ff0000');
+                    }
+                });
+                asteroids = asteroids.filter(a => a.isBossProjectile);
+                // Create massive screen shake effect
+                for (let i = 0; i < 200; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        vx: (Math.random() - 0.5) * 20,
+                        vy: (Math.random() - 0.5) * 20,
+                        life: 1,
+                        color: '#ff0000'
+                    });
+                }
+                updateHUD();
+                return;
+            }
+            
+            // Singularity - creates expanding void
+            if (type === 'SINGULARITY') {
+                activePowerUps.SINGULARITY_CENTER = {
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    radius: 0,
+                    maxRadius: 300
+                };
+                activePowerUps[type] = Date.now() + power.duration;
+                return;
+            }
+            
+            if (type === 'NUKE') {
+                activePowerUps.NUKE_ACTIVE = true;
+            } else if (power.permanent) {
+                // Permanent power-ups never expire (set to Infinity)
+                activePowerUps[type] = Infinity;
+            } else {
+                activePowerUps[type] = Date.now() + power.duration;
+            }
+        }
+
+        function draw() {
+            if (!gameState.isRunning) return;
+            
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw stars
+            ctx.fillStyle = '#fff';
+            stars.forEach(star => {
+                ctx.fillRect(star.x, star.y, star.size, star.size);
+            });
+            
+            // Draw boss
+            if (boss) {
+                ctx.save();
+                ctx.translate(boss.x + boss.width / 2, boss.y + boss.height / 2);
+                
+                // Boss body
+                ctx.fillStyle = '#ff0000';
+                ctx.strokeStyle = '#ff6600';
+                ctx.lineWidth = 4;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#ff0000';
+                
+                // Draw skull-like shape
+                ctx.beginPath();
+                ctx.arc(0, 0, boss.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                
+                // Eyes
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(-25, -10, 15, 0, Math.PI * 2);
+                ctx.arc(25, -10, 15, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0;
+                ctx.restore();
+                
+                // Boss health bar
+                const barWidth = boss.width;
+                const barHeight = 10;
+                const barX = boss.x;
+                const barY = boss.y - 20;
+                const healthPercent = boss.health / boss.maxHealth;
+                
+                ctx.fillStyle = '#330000';
+                ctx.fillRect(barX, barY, barWidth, barHeight);
+                ctx.fillStyle = '#ff0000';
+                ctx.fillRect(barX, barY, barWidth * healthPercent, barHeight);
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(barX, barY, barWidth, barHeight);
+                
+                // Boss health text
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`BOSS: ${Math.ceil(boss.health)}/${boss.maxHealth}`, boss.x + boss.width / 2, barY - 5);
+            }
+            
+            // Draw player
+            ctx.save();
+            ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
+            
+
+            
+            ctx.beginPath();
+            ctx.moveTo(0, -player.height / 2);
+            ctx.lineTo(-player.width / 2, player.height / 2);
+            ctx.lineTo(0, player.height / 3);
+            ctx.lineTo(player.width / 2, player.height / 2);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw shield (temporary or permanent)
+            const hasShield = (activePowerUps.SHIELD && now < activePowerUps.SHIELD) ||
+                            activePowerUps.PERM_SHIELD === Infinity;
+            if (hasShield) {
+                ctx.strokeStyle = activePowerUps.PERM_SHIELD === Infinity ? '#00ffff' : '#00ffff';
+                ctx.lineWidth = activePowerUps.PERM_SHIELD === Infinity ? 4 : 3;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#00ffff';
+                ctx.beginPath();
+                ctx.arc(0, 0, player.width, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Add extra glow for permanent shield
+                if (activePowerUps.PERM_SHIELD === Infinity) {
+                    ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+                    ctx.lineWidth = 8;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, player.width + 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.shadowBlur = 0;
+            ctx.restore();
+            
+            // Player health bar
+            const healthBarWidth = 100;
+            const healthBarHeight = 10;
+            const healthBarX = player.x + player.width / 2 - healthBarWidth / 2;
+            const healthBarY = player.y - 15;
+            const healthPercent = player.health / player.maxHealth;
+            
+            ctx.fillStyle = '#660000';
+            ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercent, healthBarHeight);
+            
+            // Draw bullets
+            bullets.forEach(bullet => {
+                if (bullet.isMegaLaser) {
+                    // Mega Laser - ultra wide green beam
+                    ctx.fillStyle = 'rgba(50, 205, 50, 0.8)';
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = '#32cd32';
+                    ctx.fillRect(bullet.x, 0, bullet.width, canvas.height);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isPlasmaWave) {
+                    // Plasma Wave - expanding circle
+                    ctx.strokeStyle = '#00ffaa';
+                    ctx.lineWidth = 4;
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#00ffaa';
+                    ctx.beginPath();
+                    ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isChainLightning) {
+                    // Chain Lightning - electric blue
+                    ctx.fillStyle = '#00bfff';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#00bfff';
+                    ctx.fillRect(bullet.x - 1, bullet.y, bullet.width + 2, bullet.height);
+                    // Lightning effect
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(bullet.x + bullet.width / 2, bullet.y);
+                    ctx.lineTo(bullet.x + bullet.width / 2, bullet.y + bullet.height);
+                    ctx.stroke();
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isBoomerang) {
+                    // Boomerang - spinning pink
+                    ctx.save();
+                    ctx.translate(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2);
+                    ctx.rotate(Date.now() * 0.01);
+                    ctx.fillStyle = '#ff69b4';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#ff69b4';
+                    ctx.fillRect(-bullet.width / 2, -bullet.height / 2, bullet.width, bullet.height);
+                    ctx.shadowBlur = 0;
+                    ctx.restore();
+                } else if (bullet.isOrbital) {
+                    // Orbital Strike - bright red beam
+                    ctx.fillStyle = 'rgba(255, 0, 136, 0.9)';
+                    ctx.shadowBlur = 25;
+                    ctx.shadowColor = '#ff0088';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isAsteroidRain) {
+                    // Asteroid Rain - friendly rocks
+                    ctx.save();
+                    ctx.translate(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2);
+                    ctx.rotate(bullet.rotation || 0);
+                    bullet.rotation = (bullet.rotation || 0) + 0.1;
+                    ctx.fillStyle = '#ff6347';
+                    ctx.strokeStyle = '#8b0000';
+                    ctx.lineWidth = 2;
+                    ctx.fillRect(-bullet.width / 2, -bullet.height / 2, bullet.width, bullet.height);
+                    ctx.strokeRect(-bullet.width / 2, -bullet.height / 2, bullet.width, bullet.height);
+                    ctx.restore();
+                } else if (bullet.isLaser) {
+                    // Laser beam - wide bright green beam with inner core
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'lighter';
+                    
+                    // Outer glow (widest)
+                    ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+                    ctx.shadowBlur = 40;
+                    ctx.shadowColor = '#00ff00';
+                    ctx.fillRect(bullet.x - 8, 0, bullet.width + 16, canvas.height);
+                    
+                    // Middle layer
+                    ctx.fillStyle = 'rgba(0, 255, 0, 0.6)';
+                    ctx.shadowBlur = 25;
+                    ctx.fillRect(bullet.x - 4, 0, bullet.width + 8, canvas.height);
+                    
+                    // Main beam - SOLID and bright
+                    ctx.fillStyle = bullet.isMegaLaser ? '#32ff32' : '#00ff00';
+                    ctx.shadowBlur = 20;
+                    ctx.fillRect(bullet.x, 0, bullet.width, canvas.height);
+                    
+                    // Inner core (brightest white)
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#ffffff';
+                    ctx.fillRect(bullet.x + bullet.width/2 - 3, 0, 6, canvas.height);
+                    
+                    ctx.shadowBlur = 0;
+                    ctx.restore();
+                } else if (bullet.isHoming) {
+                    // Homing missiles - pink with trail
+                    ctx.fillStyle = '#ff1493';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#ff1493';
+                    ctx.beginPath();
+                    ctx.arc(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isPiercing) {
+                    // Piercing rounds - cyan
+                    ctx.fillStyle = '#87ceeb';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#87ceeb';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height * 1.5);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isExplosive) {
+                    // Explosive rounds - orange/red
+                    ctx.fillStyle = '#ff4500';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#ff4500';
+                    ctx.fillRect(bullet.x - 2, bullet.y, bullet.width + 4, bullet.height);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isFire) {
+                    // Fire bullets - flickering orange/red flames
+                    const flameColors = ['#ff4400', '#ff6600', '#ff8800', '#ffaa00'];
+                    const flameColor = flameColors[Math.floor(Math.random() * flameColors.length)];
+                    
+                    // Outer glow
+                    ctx.fillStyle = 'rgba(255, 68, 0, 0.3)';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#ff4400';
+                    ctx.fillRect(bullet.x - 3, bullet.y - 3, bullet.width + 6, bullet.height + 6);
+                    
+                    // Main bullet
+                    ctx.fillStyle = flameColor;
+                    ctx.shadowBlur = 15;
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                    
+                    // Flame trail particles
+                    for (let i = 0; i < 3; i++) {
+                        ctx.fillStyle = `rgba(255, ${100 + i * 40}, 0, ${0.6 - i * 0.2})`;
+                        ctx.fillRect(bullet.x + Math.random() * bullet.width, 
+                                   bullet.y + bullet.height + i * 5, 
+                                   2, 3);
+                    }
+                    
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isOmegaCannon) {
+                    // Omega Cannon - massive red shots
+                    ctx.fillStyle = '#ff6600';
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = '#ff6600';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                    ctx.fillStyle = '#ffaa00';
+                    ctx.fillRect(bullet.x + 10, bullet.y + 10, bullet.width - 20, bullet.height - 20);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isRailgun) {
+                    // Railgun - cyan penetrating beam
+                    ctx.fillStyle = '#00ffaa';
+                    ctx.shadowBlur = 25;
+                    ctx.shadowColor = '#00ffaa';
+                    ctx.fillRect(bullet.x, 0, bullet.width, canvas.height);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isPulsarBeam) {
+                    // Pulsar Beam - pulsing yellow beam
+                    bullet.pulsePhase = (bullet.pulsePhase || 0) + 0.2;
+                    const pulseAlpha = 0.5 + Math.sin(bullet.pulsePhase) * 0.3;
+                    ctx.fillStyle = `rgba(255, 255, 0, ${pulseAlpha})`;
+                    ctx.shadowBlur = 20 + Math.sin(bullet.pulsePhase) * 10;
+                    ctx.shadowColor = '#ffff00';
+                    ctx.fillRect(bullet.x, 0, bullet.width, canvas.height);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isVoidMissile) {
+                    // Void Missiles - dark purple
+                    ctx.fillStyle = '#440088';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#440088';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(bullet.x + 3, bullet.y + 3, bullet.width - 6, bullet.height - 6);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isPhotonTorpedo) {
+                    // Photon Torpedo - bright magenta
+                    ctx.fillStyle = '#ff00ff';
+                    ctx.shadowBlur = 25;
+                    ctx.shadowColor = '#ff00ff';
+                    ctx.beginPath();
+                    ctx.ellipse(bullet.x + bullet.width/2, bullet.y + bullet.height/2, bullet.width/2, bullet.height/2, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isDoubleShot) {
+                    // Double Shot - bright blue
+                    ctx.fillStyle = '#00ddff';
+                    ctx.shadowBlur = 12;
+                    ctx.shadowColor = '#00ddff';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                    ctx.shadowBlur = 0;
+                } else if (bullet.isStormBarrage) {
+                    // Storm Barrage - light blue spiraling
+                    ctx.fillStyle = '#4169e1';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#4169e1';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                    ctx.shadowBlur = 0;
+                } else {
+                    // Normal bullets - yellow
+                    ctx.fillStyle = '#ffff00';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ffff00';
+                    ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                    ctx.shadowBlur = 0;
+                }
+            });
+            
+            // Draw asteroids
+            asteroids.forEach(asteroid => {
+                ctx.save();
+                ctx.translate(asteroid.x + asteroid.width / 2, asteroid.y + asteroid.height / 2);
+                ctx.rotate(asteroid.rotation);
+                
+                ctx.fillStyle = asteroid.color;
+                ctx.strokeStyle = asteroid.isBossProjectile ? '#ff0000' : '#333';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = asteroid.golden ? 25 : 15;
+                ctx.shadowColor = asteroid.color;
+                
+                ctx.beginPath();
+                for (let i = 0; i < asteroid.sides; i++) {
+                    const angle = (i / asteroid.sides) * Math.PI * 2;
+                    const radius = (asteroid.width / 2) * (0.8 + Math.random() * 0.2);
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                
+                // Draw star for special asteroids
+                if (asteroid.special) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 30px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#ffffff';
+                    ctx.fillText('★', 0, 0);
+                }
+                
+                // Draw crown for golden asteroids
+                if (asteroid.golden) {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = 'bold 35px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#ffd700';
+                    ctx.fillText('👑', 0, 0);
+                }
+                
+                // Draw fire effect for burning asteroids
+                if (asteroid.isBurning) {
+                    ctx.fillStyle = '#ff4400';
+                    ctx.font = 'bold 25px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#ff4400';
+                    ctx.fillText('🔥', 0, -asteroid.height/2 - 10);
+                }
+                
+                ctx.shadowBlur = 0;
+                ctx.restore();
+                
+                // Draw health bar for tough asteroids
+                if (asteroid.maxHealth > 1 && !asteroid.isBossProjectile) {
+                    const barWidth = asteroid.width;
+                    const barHeight = 4;
+                    const barX = asteroid.x;
+                    const barY = asteroid.y - 10;
+                    const healthPercent = asteroid.health / asteroid.maxHealth;
+                    
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(barX, barY, barWidth, barHeight);
+                    ctx.fillStyle = asteroid.golden ? '#ffd700' : '#00ff00';
+                    ctx.fillRect(barX, barY, barWidth * healthPercent, barHeight);
+                }
+            });
+            
+            // Draw power-ups
+            powerUpItems.forEach(item => {
+                const powerType = powerUpTypes[item.type];
+                if (!powerType) return;
+                
+                ctx.save();
+                ctx.translate(item.x, item.y);
+                
+                const pulseSize = 1 + Math.sin(item.pulse) * 0.2;
+                ctx.scale(pulseSize, pulseSize);
+                
+                ctx.shadowBlur = item.isPermanent ? 30 : 20;
+                ctx.shadowColor = powerType.color;
+                ctx.fillStyle = powerType.color;
+                ctx.strokeStyle = item.isPermanent ? '#ffd700' : '#fff';
+                ctx.lineWidth = item.isPermanent ? 3 : 2;
+                
+                // Permanent power-ups have extra golden ring
+                if (item.isPermanent) {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 20, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#ffd700';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                }
+                
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI * 2 * i) / 6;
+                    const x = Math.cos(angle) * 15;
+                    const y = Math.sin(angle) * 15;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.shadowBlur = 0;
+                ctx.restore();
+            });
+            
+            // Draw particles
+            particles.forEach(particle => {
+                ctx.globalAlpha = particle.life;
+                ctx.fillStyle = particle.color;
+                ctx.fillRect(particle.x, particle.y, 3, 3);
+                ctx.globalAlpha = 1;
+            });
+            
+            // Draw boss explosion shockwave
+            if (gameState.showingVictory && gameState.bossExplosionRadius !== undefined) {
+                if (gameState.bossExplosionRadius < gameState.bossExplosionMaxRadius) {
+                    gameState.bossExplosionRadius += 8;
+                    
+                    // Draw expanding shockwave rings
+                    for (let i = 0; i < 3; i++) {
+                        const radius = gameState.bossExplosionRadius - (i * 30);
+                        if (radius > 0) {
+                            ctx.beginPath();
+                            ctx.arc(gameState.bossExplosionX, gameState.bossExplosionY, radius, 0, Math.PI * 2);
+                            ctx.strokeStyle = i === 0 ? '#ff0000' : i === 1 ? '#ff6600' : '#ffff00';
+                            ctx.lineWidth = 8 - (i * 2);
+                            ctx.globalAlpha = 1 - (radius / gameState.bossExplosionMaxRadius);
+                            ctx.stroke();
+                            ctx.globalAlpha = 1;
+                        }
+                    }
+                }
+            }
+            
+            // Draw active power-up indicators (BOTTOM LEFT)
+            let indicatorY = canvas.height - 30;
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'left';
+            
+            for (let key in activePowerUps) {
+                if (key === 'NUKE_ACTIVE') continue;
+                const endTime = activePowerUps[key];
+                const powerType = powerUpTypes[key];
+                
+                if (powerType && endTime) {
+                    if (endTime === Infinity) {
+                        // Permanent power-up
+                        ctx.fillStyle = powerType.color;
+                        ctx.shadowBlur = 5;
+                        ctx.shadowColor = powerType.color;
+                        ctx.fillText(`${powerType.name}: ∞`, 20, indicatorY);
+                        ctx.shadowBlur = 0;
+                        indicatorY -= 25;
+                    } else if (Date.now() < endTime) {
+                        // Temporary power-up with timer
+                        const timeLeft = Math.ceil((endTime - Date.now()) / 1000);
+                        ctx.fillStyle = powerType.color;
+                        ctx.shadowBlur = 5;
+                        ctx.shadowColor = powerType.color;
+                        ctx.fillText(`${powerType.name}: ${timeLeft}s`, 20, indicatorY);
+                        ctx.shadowBlur = 0;
+                        indicatorY -= 25;
+                    }
+                }
+            }
+            
+            // Draw special ability effects
+            const now = Date.now();
+            if (activePowerUps.TRIPLE_SIZE && now < activePowerUps.TRIPLE_SIZE) {
+                ctx.scale(3, 3);
+            }
+            
+            // Ghost Mode transparency
+            if (activePowerUps.GHOST_MODE && now < activePowerUps.GHOST_MODE) {
+                ctx.globalAlpha = 0.4;
+            }
+            
+            ctx.fillStyle = player.color;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = player.color;
+            
+            // Extra glow for invincibility
+            if (activePowerUps.INVINCIBILITY && now < activePowerUps.INVINCIBILITY) {
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = '#ffd700';
+            }
+            // Black Hole visual
+            if (activePowerUps.BLACK_HOLE && now < activePowerUps.BLACK_HOLE) {
+                const bhX = canvas.width / 2;
+                const bhY = canvas.height / 3;
+                ctx.fillStyle = 'rgba(0, 0, 136, 0.5)';
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = '#000088';
+                ctx.beginPath();
+                ctx.arc(bhX, bhY, 100, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            
+            // Tesla Coil arcs
+            if (activePowerUps.TESLA_COIL && now < activePowerUps.TESLA_COIL) {
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#00ffff';
+                asteroids.forEach(asteroid => {
+                    const dist = Math.hypot(asteroid.x - player.x, asteroid.y - player.y);
+                    if (dist < 200 && !asteroid.isBossProjectile) {
+                        ctx.beginPath();
+                        ctx.moveTo(player.x + player.width/2, player.y + player.height/2);
+                        ctx.lineTo(asteroid.x + asteroid.width/2, asteroid.y + asteroid.height/2);
+                        ctx.stroke();
+                    }
+                });
+                ctx.shadowBlur = 0;
+            }
+            
+            // Shockwave rings
+            if (activePowerUps.SHOCKWAVE_RADIUS !== undefined && activePowerUps.SHOCKWAVE_RADIUS < 300) {
+                ctx.strokeStyle = '#00ff99';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#00ff99';
+                ctx.beginPath();
+                ctx.arc(player.x + player.width/2, player.y + player.height/2, activePowerUps.SHOCKWAVE_RADIUS, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+            
+            // Singularity void
+            if (activePowerUps.SINGULARITY_CENTER) {
+                const sing = activePowerUps.SINGULARITY_CENTER;
+                ctx.fillStyle = 'rgba(255, 0, 136, 0.3)';
+                ctx.shadowBlur = 50;
+                ctx.shadowColor = '#ff0088';
+                ctx.beginPath();
+                ctx.arc(sing.x, sing.y, sing.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            
+            // Draw pause overlay
+            if (gameState.isPaused) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#00ff88';
+                ctx.font = 'bold 48px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+            }
+            
+            // Draw victory message
+            if (gameState.showingVictory) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#ffd700';
+                ctx.font = 'bold 72px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = '#ffd700';
+                ctx.fillText('VICTORY!', canvas.width / 2, canvas.height / 2 - 50);
+                
+                ctx.fillStyle = '#00ff88';
+                ctx.font = 'bold 32px Arial';
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#00ff88';
+                ctx.fillText('BOSS DEFEATED!', canvas.width / 2, canvas.height / 2 + 30);
+                
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 1,
+                    color: color
+                });
+            }
+        }
+
+        function displayLeaderboard() {
+            const list = document.getElementById('leaderboardList');
+            if (!playerData.leaderboard || playerData.leaderboard.length === 0) {
+                list.innerHTML = '<p style="color: #aaa; text-align: center; font-size: 18px;">No scores yet. Play to set a record!</p>';
+                return;
+            }
+
+            // Sort leaderboard by score
+            const sorted = [...playerData.leaderboard].sort((a, b) => b.score - a.score).slice(0, 10);
+            
+            list.innerHTML = sorted.map((entry, index) => {
+                const rank = index + 1;
+                const isTop3 = rank <= 3;
+                return `
+                    <div class="leaderboard-entry ${isTop3 ? 'top3' : ''}">
+                        <div class="leaderboard-rank">#${rank}</div>
+                        <div class="leaderboard-name">${entry.name}</div>
+                        <div class="leaderboard-score">${entry.score.toLocaleString()}</div>
+                        <div class="leaderboard-mode">${entry.mode.toUpperCase()}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function checkHighScore() {
+            // Check if this score makes it to top 10
+            if (!playerData.leaderboard) playerData.leaderboard = [];
+            
+            const sorted = [...playerData.leaderboard].sort((a, b) => b.score - a.score);
+            const isTopTen = sorted.length < 10 || gameState.score > sorted[sorted.length - 1].score;
+            
+            if (isTopTen) {
+                document.getElementById('highScoreValue').textContent = gameState.score;
+                document.getElementById('nameInputModal').classList.add('active');
+                document.getElementById('playerNameInput').value = '';
+                document.getElementById('playerNameInput').focus();
+            }
+        }
+
+        function submitHighScore() {
+            const name = document.getElementById('playerNameInput').value.trim() || 'Anonymous';
+            
+            if (!playerData.leaderboard) playerData.leaderboard = [];
+            
+            playerData.leaderboard.push({
+                name: name,
+                score: gameState.score,
+                mode: gameState.mode,
+                date: new Date().toISOString()
+            });
+            
+            // Keep only top 10
+            playerData.leaderboard.sort((a, b) => b.score - a.score);
+            if (playerData.leaderboard.length > 10) {
+                playerData.leaderboard = playerData.leaderboard.slice(0, 10);
+            }
+            
+            savePlayerData();
+            document.getElementById('nameInputModal').classList.remove('active');
+        }
+
+        function endGame(victory) {
+            gameState.isRunning = false;
+            if (asteroidSpawner) clearInterval(asteroidSpawner);
+            if (bossTimer) clearTimeout(bossTimer);
+            
+            // Update player stats
+            playerData.gamesPlayed++;
+            if (gameState.score > playerData.highScore) {
+                playerData.highScore = gameState.score;
+            }
+            playerData.coins += gameState.coinsThisRun;
+            playerData.totalKills += gameState.totalKills;
+            
+            // Check for mode unlocks
+            if (gameState.mode === 'normal' && gameState.score >= 5000) {
+                if (!playerData.unlockedModes.includes('hard')) {
+                    playerData.unlockedModes.push('hard');
+                }
+            }
+            if (gameState.mode === 'hard' && gameState.score >= 10000) {
+                if (!playerData.unlockedModes.includes('expert')) {
+                    playerData.unlockedModes.push('expert');
+                }
+            }
+            
+            savePlayerData();
+            
+            canvas.style.display = 'none';
+            document.getElementById('hud').style.display = 'none';
+            document.getElementById('instructions').style.display = 'none';
+            
+            if (victory) {
+                // Show victory screen first
+                document.getElementById('victoryScore').textContent = gameState.score;
+                document.getElementById('victoryCoins').textContent = gameState.coinsThisRun;
+                document.getElementById('victoryScreen').classList.add('active');
+                
+                // After 3 seconds, show game over screen and check for high score
+                setTimeout(() => {
+                    document.getElementById('victoryScreen').classList.remove('active');
+                    
+                    const gameOverTitle = document.getElementById('gameOverTitle');
+                    gameOverTitle.textContent = 'VICTORY!';
+                    gameOverTitle.style.color = '#ffd700';
+                    
+                    document.getElementById('finalScore').textContent = gameState.score;
+                    document.getElementById('coinsEarned').textContent = gameState.coinsThisRun;
+                    document.getElementById('gameOver').classList.add('active');
+                    
+                    // Check if high score after showing game over
+                    checkHighScore();
+                }, 3000);
+            } else {
+                // For defeat, show game over screen immediately
+                const gameOverTitle = document.getElementById('gameOverTitle');
+                gameOverTitle.textContent = 'DEFEATED';
+                gameOverTitle.style.color = '#ff0000';
+                
+                document.getElementById('finalScore').textContent = gameState.score;
+                document.getElementById('coinsEarned').textContent = gameState.coinsThisRun;
+                document.getElementById('gameOver').classList.add('active');
+                
+                // Check if high score
+                checkHighScore();
+            }
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Initialize and start
+        initScreens();
+        gameLoop();
+    </script>
+</body>
+</html>
