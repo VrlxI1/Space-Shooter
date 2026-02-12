@@ -1,17 +1,21 @@
-# Dockerfile for Railway - Project Root
+# Use Node.js LTS (Long Term Support) image
 FROM node:20-slim
 
-WORKDIR /app
+# Create and change to the app directory
+WORKDIR /usr/src/app
 
-# Copy the backend files specifically
-COPY backend/package*.json ./
-RUN npm install --production
-COPY backend/ .
+# Copy application dependency manifests to the container image.
+# A wildcard is used to ensure both package.json AND package-lock.json are copied.
+COPY package*.json ./
 
-# Ensure reset.json and leaderboard.json exist
-RUN touch reset.json leaderboard.json
+# Install production dependencies.
+RUN npm install --only=production
 
-ENV NODE_ENV=production
+# Copy local code to the container image.
+COPY . .
+
+# Expone the port the app runs on
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Run the web service on container startup.
+CMD [ "npm", "start" ]
