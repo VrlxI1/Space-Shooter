@@ -1813,7 +1813,7 @@
             }
 
             // Minigun override
-            const hasMinigun = activePowerUps.MINIGUN && now < activePowerUps.MINIGUN;
+            let hasMinigun = activePowerUps.MINIGUN && now < activePowerUps.MINIGUN;
             const effectiveFireRate = hasMinigun ? 40 : fireRate;
 
             if (now - player.lastShot < effectiveFireRate) return;
@@ -1844,7 +1844,7 @@
             const hasFire = (activePowerUps.FIRE_BULLETS && now < activePowerUps.FIRE_BULLETS) ||
                 activePowerUps.PERM_FIRE === Infinity;
             const hasMegaLaser = activePowerUps.MEGA_LASER && now < activePowerUps.MEGA_LASER;
-            const hasBoomerang = activePowerUps.BOOMERANG_SHOTS && now < activePowerUps.BOOMERANG_SHOTS;
+            let hasBoomerang = activePowerUps.BOOMERANG_SHOTS && now < activePowerUps.BOOMERANG_SHOTS;
             const hasChainLightning = (activePowerUps.CHAIN_LIGHTNING && now < activePowerUps.CHAIN_LIGHTNING) ||
                 activePowerUps.PERM_CHAIN === Infinity;
             const hasPlasmaWave = activePowerUps.PLASMA_WAVE && now < activePowerUps.PLASMA_WAVE;
@@ -1865,7 +1865,6 @@
             const hasDoubleShot = activePowerUps.DOUBLE_SHOT && now < activePowerUps.DOUBLE_SHOT;
             const hasStormBarrage = activePowerUps.STORM_BARRAGE && now < activePowerUps.STORM_BARRAGE;
             const hasPhotonTorpedo = activePowerUps.PHOTON_TORPEDO && now < activePowerUps.PHOTON_TORPEDO;
-            hasMinigun = activePowerUps.MINIGUN && now < activePowerUps.MINIGUN;
             const hasRailgun = activePowerUps.RAILGUN && now < activePowerUps.RAILGUN;
             const hasVoidMissiles = activePowerUps.VOID_MISSILES && now < activePowerUps.VOID_MISSILES;
             const hasPulsarBeam = activePowerUps.PULSAR_BEAM && now < activePowerUps.PULSAR_BEAM;
@@ -2909,8 +2908,10 @@
             ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
 
 
-
             ctx.beginPath();
+            ctx.fillStyle = player.color;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = player.color;
             ctx.moveTo(0, -player.height / 2);
             ctx.lineTo(-player.width / 2, player.height / 2);
             ctx.lineTo(0, player.height / 3);
