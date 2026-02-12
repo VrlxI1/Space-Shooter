@@ -951,7 +951,7 @@
         let adminLog = [];
 
         // Global reset configuration
-        let globalResetUrl = localStorage.getItem('spaceShooterGlobalResetURL') || 'https://space-shooter-production-1747.up.railway.app/reset';
+        let globalResetUrl = 'https://space-shooter-production-1747.up.railway.app/reset';
         let lastGlobalResetTS = localStorage.getItem('spaceShooterGlobalResetTS') || null;
 
 
@@ -3349,7 +3349,7 @@
         async function checkHighScore() {
             // Check if this score makes it to top 10 FROM GLOBAL LEADERRBOARD
             try {
-                const baseUrl = globalResetUrl.replace('/reset', '');
+                const baseUrl = globalResetUrl.split('/reset')[0].replace(/\/$/, "");
                 const res = await fetch(`${baseUrl}/leaderboard`, { cache: 'no-store' });
                 if (!res.ok) throw new Error('Failed to fetch leaderboard');
                 const leaderboardData = await res.json();
@@ -3374,7 +3374,7 @@
             const name = document.getElementById('playerNameInput').value.trim() || 'Anonymous';
 
             try {
-                const baseUrl = globalResetUrl.replace('/reset', '');
+                const baseUrl = globalResetUrl.split('/reset')[0].replace(/\/$/, "");
                 const res = await fetch(`${baseUrl}/leaderboard`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
