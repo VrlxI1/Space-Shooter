@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 PORT = 8000
-GAME_FILE = "space_shooter.html"
+GAME_FILE = "index.html"
 
 def launch_game():
     """Start the web server and open the game in the browser."""
