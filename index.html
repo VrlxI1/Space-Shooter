@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,8 +60,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
         }
 
         .instructions {
@@ -105,11 +113,14 @@
             border: none;
             padding: 0;
             border-radius: 4px;
-            cursor: default; /* do not change cursor */
-            outline: none; /* remove focus outline */
+            cursor: default;
+            /* do not change cursor */
+            outline: none;
+            /* remove focus outline */
             -webkit-tap-highlight-color: transparent;
             z-index: 200;
-            opacity: 0; /* invisible but still clickable */
+            opacity: 0;
+            /* invisible but still clickable */
         }
 
         .admin-modal {
@@ -117,7 +128,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
+            background: rgba(0, 0, 0, 0.95);
             border: 3px solid #ffd700;
             padding: 20px;
             border-radius: 10px;
@@ -127,13 +138,40 @@
             max-width: 90%;
         }
 
-        .admin-modal.active { display: block; }
+        .admin-modal.active {
+            display: block;
+        }
 
-        .admin-modal h3 { color: #ffd700; margin-bottom: 10px; }
-        .admin-row { display:flex; gap:10px; margin:8px 0; align-items:center; }
-        .admin-row label { width: 160px; color:#fff; }
-        .admin-row input { flex:1; padding:6px; border-radius:6px; border:1px solid #666; }
-        .admin-actions { margin-top: 12px; display:flex; gap:10px; justify-content:flex-end; }
+        .admin-modal h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .admin-row {
+            display: flex;
+            gap: 10px;
+            margin: 8px 0;
+            align-items: center;
+        }
+
+        .admin-row label {
+            width: 160px;
+            color: #fff;
+        }
+
+        .admin-row input {
+            flex: 1;
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #666;
+        }
+
+        .admin-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
 
         .screen.active {
             display: block !important;
@@ -438,19 +476,82 @@
             outline: none;
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
         }
+
         /* Mobile touch controls */
-        #touchControls { position: fixed; left: 0; right: 0; bottom: 0; pointer-events: none; }
-        #joyBase { position: fixed; left: 16px; bottom: 16px; width: 120px; height: 120px; background: rgba(0,0,0,0.25); border-radius: 50%; display:flex; align-items:center; justify-content:center; pointer-events: auto; }
-        #joyStick { width: 56px; height:56px; background: rgba(255,255,255,0.15); border-radius:50%; transform: translate(0,0); transition: transform 0.05s linear; }
-        #touchShoot { position: fixed; right: 18px; bottom: 28px; width: 84px; height:84px; border-radius:50%; background: rgba(255,0,0,0.8); color:#fff; font-size:28px; border:none; pointer-events:auto; }
-        #mobileFullBtn { position: fixed; right: 18px; bottom: 120px; width: 60px; height: 36px; border-radius: 8px; background: rgba(0,0,0,0.6); color:#fff; border:1px solid #444; font-size:14px; pointer-events:auto; display:flex; align-items:center; justify-content:center; }
-        @media(min-width:801px){ #touchControls { display: none; } }
+        #touchControls {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        #joyBase {
+            position: fixed;
+            left: 16px;
+            bottom: 16px;
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+        }
+
+        #joyStick {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform: translate(0, 0);
+            transition: transform 0.05s linear;
+        }
+
+        #touchShoot {
+            position: fixed;
+            right: 18px;
+            bottom: 28px;
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            background: rgba(255, 0, 0, 0.8);
+            color: #fff;
+            font-size: 28px;
+            border: none;
+            pointer-events: auto;
+        }
+
+        #mobileFullBtn {
+            position: fixed;
+            right: 18px;
+            bottom: 120px;
+            width: 60px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            border: 1px solid #444;
+            font-size: 14px;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media(min-width:801px) {
+            #touchControls {
+                display: none;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="game-container">
         <canvas id="gameCanvas" width="800" height="600"></canvas>
-        
+
         <!-- Mobile touch controls (visible on small screens) -->
         <div id="touchControls">
             <div id="joyBase">
@@ -636,22 +737,34 @@
                 <div style="max-height:44vh; overflow:auto;">
                     <div class="admin-row"><label>Coins</label><input id="adminCoins" type="number" /></div>
                     <div class="admin-row"><label>High Score</label><input id="adminHighScore" type="number" /></div>
-                    <div class="admin-row"><label>Games Played</label><input id="adminGamesPlayed" type="number" /></div>
+                    <div class="admin-row"><label>Games Played</label><input id="adminGamesPlayed" type="number" />
+                    </div>
                     <div class="admin-row"><label>Total Kills</label><input id="adminTotalKills" type="number" /></div>
-                    <div class="admin-row"><label>Bosses Defeated</label><input id="adminBossesDefeated" type="number" /></div>
+                    <div class="admin-row"><label>Bosses Defeated</label><input id="adminBossesDefeated"
+                            type="number" /></div>
                     <hr style="border-color:#333; margin:10px 0;" />
-                    <div class="admin-row"><label>Damage Multiplier</label><input id="adminDamage" type="number" step="0.1" /></div>
-                    <div class="admin-row"><label>FireRate Multiplier</label><input id="adminFireRate" type="number" step="0.1" /></div>
-                    <div class="admin-row"><label>Speed Multiplier</label><input id="adminSpeed" type="number" step="0.1" /></div>
-                    <div class="admin-row"><label>Health Multiplier</label><input id="adminHealth" type="number" step="0.1" /></div>
+                    <div class="admin-row"><label>Damage Multiplier</label><input id="adminDamage" type="number"
+                            step="0.1" /></div>
+                    <div class="admin-row"><label>FireRate Multiplier</label><input id="adminFireRate" type="number"
+                            step="0.1" /></div>
+                    <div class="admin-row"><label>Speed Multiplier</label><input id="adminSpeed" type="number"
+                            step="0.1" /></div>
+                    <div class="admin-row"><label>Health Multiplier</label><input id="adminHealth" type="number"
+                            step="0.1" /></div>
                     <hr style="border-color:#333; margin:10px 0;" />
-                    <div class="admin-row"><label>Normal Coins x</label><input id="adminCoinMultNormal" type="number" step="0.1" /></div>
-                    <div class="admin-row"><label>Hard Coins x</label><input id="adminCoinMultHard" type="number" step="0.1" /></div>
-                    <div class="admin-row"><label>Expert Coins x</label><input id="adminCoinMultExpert" type="number" step="0.1" /></div>
-                    <div class="admin-row"><label>Global Reset URL</label><input id="adminGlobalResetURL" type="text" placeholder="https://space-shooter-production-1747.up.railway.app/reset" /></div>
+                    <div class="admin-row"><label>Normal Coins x</label><input id="adminCoinMultNormal" type="number"
+                            step="0.1" /></div>
+                    <div class="admin-row"><label>Hard Coins x</label><input id="adminCoinMultHard" type="number"
+                            step="0.1" /></div>
+                    <div class="admin-row"><label>Expert Coins x</label><input id="adminCoinMultExpert" type="number"
+                            step="0.1" /></div>
+                    <div class="admin-row"><label>Global Reset URL</label><input id="adminGlobalResetURL" type="text"
+                            placeholder="https://space-shooter-production-1747.up.railway.app/reset" /></div>
                     <hr style="border-color:#333; margin:10px 0;" />
                     <div style="color:#fff; margin-top:6px; font-weight:bold">Admin Log (read-only)</div>
-                    <div id="adminLog" style="max-height:160px; overflow:auto; margin-top:8px; background:#070707; border:1px solid #222; padding:6px; color:#ddd;"></div>
+                    <div id="adminLog"
+                        style="max-height:160px; overflow:auto; margin-top:8px; background:#070707; border:1px solid #222; padding:6px; color:#ddd;">
+                    </div>
                 </div>
                 <div class="admin-actions">
                     <button class="menu-button" onclick="applyAdminChanges()">Apply</button>
@@ -694,14 +807,14 @@
         }
 
         function resetJoy() {
-            updateJoyVisual(0,0);
+            updateJoyVisual(0, 0);
             keys['arrowleft'] = keys['arrowright'] = keys['arrowup'] = keys['arrowdown'] = false;
         }
 
         function handleJoyMove(clientX, clientY) {
             const rect = joyBase.getBoundingClientRect();
-            const cx = rect.left + rect.width/2;
-            const cy = rect.top + rect.height/2;
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
             const dx = clientX - cx;
             const dy = clientY - cy;
             const max = 36; // max visual offset
@@ -727,7 +840,7 @@
         function onJoyMove(e) {
             if (!mobile.activeId) return;
             const list = e.changedTouches ? e.changedTouches : [e];
-            for (let i=0;i<list.length;i++) {
+            for (let i = 0; i < list.length; i++) {
                 const p = list[i];
                 const id = p.identifier !== undefined ? p.identifier : 'mouse';
                 if (id === mobile.activeId) {
@@ -738,7 +851,7 @@
         }
         function onJoyEnd(e) {
             const list = e.changedTouches ? e.changedTouches : [e];
-            for (let i=0;i<list.length;i++) {
+            for (let i = 0; i < list.length; i++) {
                 const p = list[i];
                 const id = p.identifier !== undefined ? p.identifier : 'mouse';
                 if (id === mobile.activeId) {
@@ -778,7 +891,7 @@
                     if (btn) btn.textContent = 'Exit Horz';
                 } else {
                     if (document.exitFullscreen) await document.exitFullscreen();
-                    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+                    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) { }
                     renderScale = 1;
                     mobileFullLandscape = false;
                     if (btn) btn.textContent = 'Full Horz';
@@ -913,7 +1026,7 @@
             INVINCIBILITY: { name: 'Invincibility', color: '#ffd700', duration: 5000, permanent: false },
             TIME_SLOW: { name: 'Time Slow', color: '#4169e1', duration: 10000, permanent: false },
             // COIN_MAGNET removed (unused)
-            
+
             // NEW POWER-UPS
             DOUBLE_SCORE: { name: 'Double Score', color: '#ffd700', duration: 15000, permanent: false },
             ORBITAL_STRIKE: { name: 'Orbital Strike', color: '#ff0088', duration: 20000, permanent: false },
@@ -930,7 +1043,7 @@
             GRAVITY_WELL: { name: 'Gravity Well', color: '#8b00ff', duration: 15000, permanent: false },
             FIRE_BULLETS: { name: 'Fire Bullets', color: '#ff4400', duration: 15000, permanent: false },
             HEALTH_RESTORE: { name: 'Health Restore', color: '#ff1493', duration: 0, permanent: false },
-            
+
             // PURCHASABLE POWER-UPS (must be unlocked in shop first)
             ANNIHILATE: { name: 'Annihilate', color: '#ff0000', duration: 8000, permanent: false, cost: 5000, description: 'Massive explosion that destroys everything on screen' },
             DOUBLE_SHOT: { name: 'Double Shot', color: '#00ddff', duration: 12000, permanent: false, cost: 3000, description: 'Fire two parallel bullet streams' },
@@ -946,7 +1059,7 @@
             PHASE_SHIFT: { name: 'Phase Shift', color: '#cc00ff', duration: 10000, permanent: false, cost: 3500, description: 'Bullets phase through obstacles and deal double damage' },
             // BLACK_HOLE and SINGULARITY removed
             OMEGA_CANNON: { name: 'Omega Cannon', color: '#ff6600', duration: 15000, permanent: false, cost: 6000, description: 'Massive cannon shots with huge explosions' },
-            
+
             // Permanent power-ups (from golden asteroids - last entire game)
             PERM_MULTI_SHOT: { name: 'Eternal Multi', color: '#ff9900', duration: -1, permanent: true },
             PERM_DAMAGE: { name: 'Eternal Power', color: '#ffff00', duration: -1, permanent: true },
@@ -1060,7 +1173,7 @@
         function updateModeCards() {
             const hardMode = document.getElementById('hardMode');
             const expertMode = document.getElementById('expertMode');
-            
+
             // Ensure hard mode is always unlocked (you can change this back to require unlock)
             if (playerData.unlockedModes.includes('hard')) {
                 hardMode.classList.remove('locked');
@@ -1080,7 +1193,7 @@
                     hardButton.textContent = 'LOCKED';
                 }
             }
-            
+
             if (playerData.unlockedModes.includes('expert')) {
                 expertMode.classList.remove('locked');
                 expertMode.onclick = () => startGame('expert');
@@ -1103,7 +1216,7 @@
         function switchShopTab(tab) {
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             document.getElementById('upgradesTab').style.display = tab === 'upgrades' ? 'grid' : 'none';
             document.getElementById('shipsTab').style.display = tab === 'ships' ? 'grid' : 'none';
             document.getElementById('abilitiesTab').style.display = tab === 'abilities' ? 'grid' : 'none';
@@ -1114,13 +1227,13 @@
             // Render upgrades
             const upgradesTab = document.getElementById('upgradesTab');
             upgradesTab.innerHTML = '';
-            
+
             for (let key in upgrades) {
                 const upgrade = upgrades[key];
                 const currentLevel = playerData.upgrades[key];
                 const nextCost = upgrade.levels[currentLevel];
                 const isMaxed = currentLevel >= upgrade.maxLevel;
-                
+
                 const item = document.createElement('div');
                 item.className = 'shop-item';
                 item.innerHTML = `
@@ -1134,16 +1247,16 @@
                 `;
                 upgradesTab.appendChild(item);
             }
-            
+
             // Render ships
             const shipsTab = document.getElementById('shipsTab');
             shipsTab.innerHTML = '';
-            
+
             for (let key in ships) {
                 const ship = ships[key];
                 const isOwned = key === 'default' || playerData.coins >= 0; // All available for now
                 const isCurrent = playerData.currentShip === key;
-                
+
                 const item = document.createElement('div');
                 item.className = 'shop-item';
                 item.innerHTML = `
@@ -1157,20 +1270,20 @@
                 `;
                 shipsTab.appendChild(item);
             }
-            
+
             // Render abilities
             const abilitiesTab = document.getElementById('abilitiesTab');
             abilitiesTab.innerHTML = '';
-            
+
             const purchasableAbilities = ['ANNIHILATE', 'DOUBLE_SHOT', 'STORM_BARRAGE',
-                                          'PHOTON_TORPEDO', 'MINIGUN', 'RAILGUN',
-                                          'QUANTUM_SHIELD', 'VOID_MISSILES', 'PULSAR_BEAM', 'SHOCKWAVE',
-                                          'PHASE_SHIFT', 'OMEGA_CANNON'];
-            
+                'PHOTON_TORPEDO', 'MINIGUN', 'RAILGUN',
+                'QUANTUM_SHIELD', 'VOID_MISSILES', 'PULSAR_BEAM', 'SHOCKWAVE',
+                'PHASE_SHIFT', 'OMEGA_CANNON'];
+
             for (let abilityKey of purchasableAbilities) {
                 const ability = powerUpTypes[abilityKey];
                 const isUnlocked = playerData.unlockedAbilities.includes(abilityKey);
-                
+
                 const item = document.createElement('div');
                 item.className = 'shop-item';
                 item.innerHTML = `
@@ -1220,10 +1333,10 @@
             const upgrade = upgrades[type];
             const currentLevel = playerData.upgrades[type];
             const cost = upgrade.levels[currentLevel];
-            
+
             if (currentLevel >= upgrade.maxLevel) return;
             if (playerData.coins < cost) return;
-            
+
             playerData.coins -= cost;
             playerData.upgrades[type]++;
             savePlayerData();
@@ -1234,7 +1347,7 @@
         function buyShip(type) {
             const ship = ships[type];
             if (playerData.coins < ship.cost && ship.cost > 0) return;
-            
+
             if (ship.cost > 0) {
                 playerData.coins -= ship.cost;
             }
@@ -1248,7 +1361,7 @@
             const ability = powerUpTypes[abilityKey];
             if (playerData.unlockedAbilities.includes(abilityKey)) return;
             if (playerData.coins < ability.cost) return;
-            
+
             playerData.coins -= ability.cost;
             playerData.unlockedAbilities.push(abilityKey);
             savePlayerData();
@@ -1258,7 +1371,7 @@
 
         function updateStats() {
             document.getElementById('statHighScore').textContent = playerData.highScore;
-                document.getElementById('statGames').textContent = playerData.gamesPlayed; // Updated to reflect correct stats
+            document.getElementById('statGames').textContent = playerData.gamesPlayed; // Updated to reflect correct stats
             document.getElementById('statKills').textContent = playerData.totalKills;
             document.getElementById('statCoins').textContent = playerData.coins;
             document.getElementById('statBosses').textContent = playerData.bossesDefeated;
@@ -1346,7 +1459,7 @@
                     // Compare with lastGlobalResetTS
                     if (!lastGlobalResetTS || new Date(resetTS) > new Date(lastGlobalResetTS)) {
                         // store and trigger local reset
-                        try { localStorage.setItem('spaceShooterGlobalResetTS', resetTS); } catch (e) {}
+                        try { localStorage.setItem('spaceShooterGlobalResetTS', resetTS); } catch (e) { }
                         lastGlobalResetTS = resetTS;
                         appendAdminLog('Received remote global reset signal: ' + resetTS);
                         // perform local clear (preserve admin log)
@@ -1423,7 +1536,7 @@
             const newUrl = (document.getElementById('adminGlobalResetURL').value || '').trim();
             if (newUrl !== globalResetUrl) {
                 globalResetUrl = newUrl;
-                try { localStorage.setItem('spaceShooterGlobalResetURL', globalResetUrl); } catch (e) {}
+                try { localStorage.setItem('spaceShooterGlobalResetURL', globalResetUrl); } catch (e) { }
                 appendAdminLog(`GlobalResetURL updated to ${globalResetUrl}`);
             }
 
@@ -1458,7 +1571,7 @@
                         appendAdminLog('Triggered global reset via ' + globalResetUrl + ' at ' + nowTS);
                         // Also perform local clear
                         localStorage.removeItem('spaceShooterData');
-                        try { localStorage.setItem('spaceShooterGlobalResetTS', nowTS); } catch (e) {}
+                        try { localStorage.setItem('spaceShooterGlobalResetTS', nowTS); } catch (e) { }
                         alert('Global reset sent; reloading.');
                         location.reload();
                     } else {
@@ -1483,7 +1596,7 @@
 
         function startGame(mode = null) {
             if (mode) gameState.mode = mode;
-            
+
             // Reset game state
             gameState.isRunning = true;
             gameState.isPaused = false;
@@ -1495,7 +1608,7 @@
             gameState.totalPauseTime = 0;
             gameState.bossActive = false;
             gameState.bossDefeated = false;
-            
+
             // Reset game objects
             asteroids = [];
             bullets = [];
@@ -1503,7 +1616,7 @@
             particles = [];
             activePowerUps = {};
             boss = null;
-            
+
             // Setup player
             const ship = ships[playerData.currentShip];
             player.x = 375;
@@ -1515,19 +1628,19 @@
             player.fireRate = 250 / (1 + playerData.upgrades.fireRate * 0.2);
             player.color = ship.color;
             player.lastShot = 0;
-            
+
             // Hide screens and show game
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             canvas.style.display = 'block';
             document.getElementById('hud').style.display = 'block';
             document.getElementById('instructions').style.display = 'block';
-            
+
             updateHUD();
-            
+
             // Start spawning
             const config = modeConfig[gameState.mode];
             asteroidSpawner = setInterval(spawnAsteroid, config.asteroidSpawnRate);
-            
+
             // Schedule boss
             bossTimer = setTimeout(() => {
                 spawnBoss();
@@ -1536,13 +1649,13 @@
 
         function spawnAsteroid() {
             if (gameState.bossActive) return; // No asteroids during boss fight
-            
+
             const config = modeConfig[gameState.mode];
-            
+
             // We'll decide each asteroid's type individually below,
             // but ensure at most one special (star/golden) per spawn batch
             let specialSpawned = false;
-            
+
             // Spawn count ramps up over time: few at start, many after ~2 minutes
             const elapsed = Date.now() - (gameState.startTime || Date.now()) - (gameState.totalPauseTime || 0);
             const ramp = Math.max(0, Math.min(1, elapsed / 120000)); // 0..1 over 120s
@@ -1581,10 +1694,10 @@
                     sides: 6,
                     special: asteroidType === 'star',
                     golden: asteroidType === 'golden',
-                    health: (asteroidType === 'golden' ? 5 : asteroidType === 'star' ? 3 : 1) * 
-                            (gameState.mode === 'expert' ? 3 : gameState.mode === 'hard' ? 2 : 1),
-                    maxHealth: (asteroidType === 'golden' ? 5 : asteroidType === 'star' ? 3 : 1) * 
-                               (gameState.mode === 'expert' ? 3 : gameState.mode === 'hard' ? 2 : 1),
+                    health: (asteroidType === 'golden' ? 5 : asteroidType === 'star' ? 3 : 1) *
+                        (gameState.mode === 'expert' ? 3 : gameState.mode === 'hard' ? 2 : 1),
+                    maxHealth: (asteroidType === 'golden' ? 5 : asteroidType === 'star' ? 3 : 1) *
+                        (gameState.mode === 'expert' ? 3 : gameState.mode === 'hard' ? 2 : 1),
                     value: asteroidType === 'golden' ? 100 : asteroidType === 'star' ? 50 : 10
                 };
                 asteroids.push(asteroid);
@@ -1592,7 +1705,7 @@
 
             // Extra random mini-rain occasionally (chance increases with time)
             if (Math.random() < 0.08 + ramp * 0.24) {
-                const extra = 1 + Math.floor(Math.random() * Math.max(2, Math.floor(scaledMax/2)));
+                const extra = 1 + Math.floor(Math.random() * Math.max(2, Math.floor(scaledMax / 2)));
                 for (let i = 0; i < extra; i++) {
                     const baseSize2 = 30 + Math.random() * 30;
                     asteroids.push({
@@ -1618,18 +1731,18 @@
         function spawnBoss() {
             const config = modeConfig[gameState.mode];
             gameState.bossActive = true;
-            
+
             // Show warning
             const warning = document.getElementById('bossWarning');
             warning.style.display = 'block';
             setTimeout(() => {
                 warning.style.display = 'none';
             }, 2000);
-            
+
             // Clear asteroids
             asteroids = [];
             clearInterval(asteroidSpawner);
-            
+
             // Create boss
             boss = {
                 x: canvas.width / 2 - 75,
@@ -1649,50 +1762,50 @@
         function shoot() {
             const now = Date.now();
             let fireRate = player.fireRate;
-            
+
             // Fire rate boost power-up (temporary or permanent)
             if ((activePowerUps.FIRE_RATE_BOOST && now < activePowerUps.FIRE_RATE_BOOST) ||
                 activePowerUps.PERM_FIRE_RATE === Infinity) {
                 // Permanent: 30% boost (0.7x), Temporary: 50% boost (0.5x)
                 fireRate *= activePowerUps.PERM_FIRE_RATE === Infinity ? 0.7 : 0.5;
             }
-            
+
             // Rapid fire power-up (temporary only)
             if (activePowerUps.RAPID_FIRE && now < activePowerUps.RAPID_FIRE) {
                 fireRate *= 0.3;
             }
-            
+
             if (now - player.lastShot < fireRate) return;
             player.lastShot = now;
-            
+
             let damage = player.damage;
-            
+
             // Damage boost power-up (temporary or permanent)
             if ((activePowerUps.DAMAGE_BOOST && now < activePowerUps.DAMAGE_BOOST) ||
                 activePowerUps.PERM_DAMAGE === Infinity) {
                 // Permanent: 50% boost (1.5x), Temporary: 100% boost (2x)
                 damage *= activePowerUps.PERM_DAMAGE === Infinity ? 1.5 : 2;
             }
-            
+
             // Check active weapon types
             const hasMultiShot = (activePowerUps.MULTI_SHOT && now < activePowerUps.MULTI_SHOT) ||
-                                activePowerUps.PERM_MULTI_SHOT === Infinity;
+                activePowerUps.PERM_MULTI_SHOT === Infinity;
             const hasScatter = activePowerUps.SCATTER_SHOT && now < activePowerUps.SCATTER_SHOT;
             const hasLaser = (activePowerUps.LASER_BEAM && now < activePowerUps.LASER_BEAM) ||
-                            activePowerUps.PERM_LASER === Infinity;
+                activePowerUps.PERM_LASER === Infinity;
             // Homing should work with all power-ups except laser — explicitly disable when laser active
             const hasHoming = (!hasLaser) && ((activePowerUps.HOMING_MISSILES && now < activePowerUps.HOMING_MISSILES) ||
-                             activePowerUps.PERM_HOMING === Infinity);
+                activePowerUps.PERM_HOMING === Infinity);
             const hasPiercing = (activePowerUps.PIERCING_ROUNDS && now < activePowerUps.PIERCING_ROUNDS) ||
-                                   activePowerUps.PERM_PIERCING === Infinity; // Ensure piercing rounds are checked correctly
+                activePowerUps.PERM_PIERCING === Infinity; // Ensure piercing rounds are checked correctly
             const hasExplosive = (activePowerUps.EXPLOSIVE_ROUNDS && now < activePowerUps.EXPLOSIVE_ROUNDS) ||
-                                activePowerUps.PERM_EXPLOSIVE === Infinity;
+                activePowerUps.PERM_EXPLOSIVE === Infinity;
             const hasFire = (activePowerUps.FIRE_BULLETS && now < activePowerUps.FIRE_BULLETS) ||
-                           activePowerUps.PERM_FIRE === Infinity;
+                activePowerUps.PERM_FIRE === Infinity;
             const hasMegaLaser = activePowerUps.MEGA_LASER && now < activePowerUps.MEGA_LASER;
             const hasBoomerang = activePowerUps.BOOMERANG_SHOTS && now < activePowerUps.BOOMERANG_SHOTS;
             const hasChainLightning = (activePowerUps.CHAIN_LIGHTNING && now < activePowerUps.CHAIN_LIGHTNING) ||
-                                     activePowerUps.PERM_CHAIN === Infinity;
+                activePowerUps.PERM_CHAIN === Infinity;
             const hasPlasmaWave = activePowerUps.PLASMA_WAVE && now < activePowerUps.PLASMA_WAVE;
 
             // Enforce permanent-power priority: permanent homing takes priority over conflicting timed abilities
@@ -1706,7 +1819,7 @@
 
                 if (typeof hasBoomerang !== 'undefined') hasBoomerang = false;
             }
-            
+
             // NEW PURCHASABLE ABILITIES
             const hasDoubleShot = activePowerUps.DOUBLE_SHOT && now < activePowerUps.DOUBLE_SHOT;
             const hasStormBarrage = activePowerUps.STORM_BARRAGE && now < activePowerUps.STORM_BARRAGE;
@@ -1717,10 +1830,10 @@
             const hasPulsarBeam = activePowerUps.PULSAR_BEAM && now < activePowerUps.PULSAR_BEAM;
             const hasPhaseShift = activePowerUps.PHASE_SHIFT && now < activePowerUps.PHASE_SHIFT;
             const hasOmegaCannon = activePowerUps.OMEGA_CANNON && now < activePowerUps.OMEGA_CANNON;
-            
+
             // Minigun - fire rate override
             if (hasMinigun && now - player.lastShot < 50) return; // Ultra fast firing
-            
+
             // Omega Cannon (massive slow shots)
             if (hasOmegaCannon) {
                 bullets.push({
@@ -1953,21 +2066,21 @@
         function updateHUD() {
             document.getElementById('score').textContent = gameState.score;
             document.getElementById('coins').textContent = gameState.coinsThisRun;
-            
-            const elapsed = gameState.bossActive ? 
-                modeConfig[gameState.mode].bossTime : 
+
+            const elapsed = gameState.bossActive ?
+                modeConfig[gameState.mode].bossTime :
                 Date.now() - gameState.startTime - gameState.totalPauseTime;
             const minutes = Math.floor(elapsed / 60000);
             const seconds = Math.floor((elapsed % 60000) / 1000);
-            document.getElementById('timer').textContent = 
+            document.getElementById('timer').textContent =
                 `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
         function update() {
             if (!gameState.isRunning || gameState.isPaused) return;
-            
+
             updateHUD();
-            
+
             // Update stars
             stars.forEach(star => {
                 star.y += star.speed;
@@ -1976,16 +2089,16 @@
                     star.x = Math.random() * canvas.width;
                 }
             });
-            
+
             // Player movement
             const now = Date.now();
             let moveSpeed = player.speed;
-            
+
             // Speed boost
             if (activePowerUps.SPEED_BOOST && now < activePowerUps.SPEED_BOOST) {
                 moveSpeed *= 1.5;
             }
-            
+
             if ((keys['arrowleft'] || keys['a']) && player.x > 0) {
                 player.x -= moveSpeed;
             }
@@ -2001,7 +2114,7 @@
 
             // Continuous shooting when space held
             if (shooting) shoot();
-            
+
             // Update bullets
             bullets = bullets.filter(bullet => {
                 // Handle plasma wave (expanding circle)
@@ -2047,7 +2160,7 @@
                             closest = asteroid;
                         }
                     });
-                    
+
                     if (closest && closestDist < 300) {
                         const angle = Math.atan2(closest.y - bullet.y, closest.x - bullet.x);
                         bullet.x += Math.cos(angle) * 8;
@@ -2064,17 +2177,17 @@
                     bullet.y -= bullet.speed;
                     if (bullet.vx) bullet.x += bullet.vx;
                 }
-                
+
                 return bullet.y > -bullet.height && bullet.x > -50 && bullet.x < canvas.width + 50;
             });
-            
+
             // Update boss
             if (boss) {
                 // Move to position
                 if (boss.y < boss.targetY) {
                     boss.y += boss.speed;
                 }
-                
+
                 // Boss shooting - ALWAYS shoots 3 projectiles at player's current position
                 const bossNow = Date.now();
                 if (bossNow - boss.lastShot > boss.shootInterval) {
@@ -2083,11 +2196,11 @@
                     for (let i = -1; i <= 1; i++) {
                         const startX = boss.x + boss.width / 2 + i * 30;
                         const startY = boss.y + boss.height;
-                        
+
                         // Calculate angle to player
                         const angle = Math.atan2(player.y - startY, player.x - startX);
                         const projectileSpeed = 4;
-                        
+
                         asteroids.push({
                             x: startX,
                             y: startY,
@@ -2110,13 +2223,13 @@
                         });
                     }
                 }
-                
+
                 // Check bullet collisions with boss
                 bullets = bullets.filter(bullet => {
                     if (checkCollision(bullet, boss)) {
                         boss.health -= bullet.damage;
                         createExplosion(bullet.x, bullet.y, '#ffff00');
-                        
+
                         if (boss.health <= 0) {
                             // Boss defeated!
                             gameState.bossDefeated = true;
@@ -2125,7 +2238,7 @@
                             gameState.coinsThisRun += bossReward;
                             gameState.score += 5000;
                             playerData.bossesDefeated++;
-                            
+
                             // Create massive explosion effect
                             for (let i = 0; i < 100; i++) {
                                 particles.push({
@@ -2137,13 +2250,13 @@
                                     color: i % 3 === 0 ? '#ff0000' : i % 3 === 1 ? '#ff6600' : '#ffff00'
                                 });
                             }
-                            
+
                             // Store boss position for animation
                             gameState.bossExplosionX = boss.x + boss.width / 2;
                             gameState.bossExplosionY = boss.y + boss.height / 2;
                             gameState.bossExplosionRadius = 0;
                             gameState.bossExplosionMaxRadius = 200;
-                            
+
                             // Show victory message
                             gameState.showingVictory = true;
                             boss = null;
@@ -2152,35 +2265,35 @@
                                 endGame(true);
                             }, 3000);
                         }
-                        
+
                         return false;
                     }
                     return true;
                 });
             }
-            
+
             // Update asteroids
             asteroids = asteroids.filter(asteroid => {
                 const astNow = Date.now();
                 let asteroidSpeed = asteroid.speed;
-                
+
                 // Time slow effect
                 if (activePowerUps.TIME_SLOW && astNow < activePowerUps.TIME_SLOW) {
                     asteroidSpeed *= 0.3;
                 }
-                
+
                 // Gravity Well - pulls asteroids towards player
                 if (activePowerUps.GRAVITY_WELL && astNow < activePowerUps.GRAVITY_WELL) {
                     const angle = Math.atan2(player.y - asteroid.y, player.x - asteroid.x);
                     asteroid.x += Math.cos(angle) * 1;
                     asteroid.y += Math.sin(angle) * 1;
                 }
-                
+
                 // Boss projectiles use velocity-based movement
                 if (asteroid.isBossProjectile && asteroid.vx !== undefined && asteroid.vy !== undefined) {
                     asteroid.x += asteroid.vx;
                     asteroid.y += asteroid.vy;
-                    
+
                     // Handle bouncing off walls
                     if (asteroid.canBounce && asteroid.bounceCount < 3) {
                         // Bounce off left and right walls
@@ -2200,16 +2313,16 @@
                     // Regular asteroids use simple downward movement
                     asteroid.y += asteroidSpeed;
                 }
-                
+
                 asteroid.rotation += asteroid.rotationSpeed;
-                
+
                 // Apply burning damage over time
                 if (asteroid.isBurning) {
                     const burnInterval = 500; // Apply burn damage every 500ms
                     if (astNow - asteroid.burnStartTime >= burnInterval * (6 - asteroid.burnTicks)) {
                         asteroid.health -= asteroid.burnDamage;
                         asteroid.burnTicks--;
-                        
+
                         // Create fire particles
                         particles.push({
                             x: asteroid.x + Math.random() * asteroid.width,
@@ -2219,72 +2332,72 @@
                             life: 0.5,
                             color: Math.random() > 0.5 ? '#ff4400' : '#ff6600'
                         });
-                        
+
                         if (asteroid.burnTicks <= 0) {
                             asteroid.isBurning = false;
                         }
                     }
                 }
-                
+
                 // Check collision with player
                 if (checkCollision(asteroid, player)) {
                     // Ghost Mode - pass through asteroids
                     if (activePowerUps.GHOST_MODE && astNow < activePowerUps.GHOST_MODE) {
                         return true; // Keep asteroid, no damage
                     }
-                    
+
                     // Invincibility
                     if (activePowerUps.INVINCIBILITY && astNow < activePowerUps.INVINCIBILITY) {
                         createExplosion(asteroid.x, asteroid.y, asteroid.color);
                         return false;
                     }
-                    
+
                     // Reflector Shield - bounces asteroids back
-                        if (activePowerUps.REFLECTOR_SHIELD && astNow < activePowerUps.REFLECTOR_SHIELD) {
-                            asteroid.speed *= -1.5;
-                            asteroid.y -= 20;
-                            createExplosion(asteroid.x, asteroid.y, '#silver');
-                            return true;
-                        }
-                    
-                        // Shield removed — collisions always damage player
-                        player.health--;
-                        createExplosion(asteroid.x, asteroid.y, asteroid.color);
-                        if (player.health <= 0) {
-                            endGame(false);
-                        }
-                        return false;
+                    if (activePowerUps.REFLECTOR_SHIELD && astNow < activePowerUps.REFLECTOR_SHIELD) {
+                        asteroid.speed *= -1.5;
+                        asteroid.y -= 20;
+                        createExplosion(asteroid.x, asteroid.y, '#silver');
+                        return true;
                     }
+
+                    // Shield removed — collisions always damage player
+                    player.health--;
+                    createExplosion(asteroid.x, asteroid.y, asteroid.color);
+                    if (player.health <= 0) {
+                        endGame(false);
+                    }
+                    return false;
+                }
 
                 return asteroid.y < canvas.height + 50;
             });
-            
+
             // Check bullet-asteroid collisions
             bullets = bullets.filter(bullet => {
                 let bulletHit = false;
-                
+
                 asteroids = asteroids.filter(asteroid => {
                     if (asteroid.isBossProjectile) return true; // Can't shoot boss projectiles
-                    
+
                     // Check different collision types
                     let hit = false;
-                    
+
                     if (bullet.isPlasmaWave) {
                         // Circular collision for plasma wave
-                        const dist = Math.hypot(bullet.x - (asteroid.x + asteroid.width/2), bullet.y - (asteroid.y + asteroid.height/2));
-                        hit = dist < bullet.radius + asteroid.width/2;
+                        const dist = Math.hypot(bullet.x - (asteroid.x + asteroid.width / 2), bullet.y - (asteroid.y + asteroid.height / 2));
+                        hit = dist < bullet.radius + asteroid.width / 2;
                     } else if (bullet.isLaser || bullet.isMegaLaser) {
                         // Laser beam collision
-                        hit = bullet.x < asteroid.x + asteroid.width && 
-                              bullet.x + bullet.width > asteroid.x && asteroid.y < canvas.height;
+                        hit = bullet.x < asteroid.x + asteroid.width &&
+                            bullet.x + bullet.width > asteroid.x && asteroid.y < canvas.height;
                     } else {
                         // Standard collision
                         hit = checkCollision(bullet, asteroid);
                     }
-                    
+
                     if (hit) {
                         asteroid.health -= bullet.damage;
-                        
+
                         // Fire bullets apply burning damage over time
                         if (bullet.isFire && !asteroid.isBurning) {
                             asteroid.isBurning = true;
@@ -2292,7 +2405,7 @@
                             asteroid.burnDamage = bullet.damage * 0.3; // 30% of bullet damage per tick
                             asteroid.burnTicks = 5; // Burns for 5 ticks
                         }
-                        
+
                         // Chain lightning jumps to nearby asteroids
                         if (bullet.isChainLightning && bullet.chainCount > 0) {
                             bullet.chainCount--;
@@ -2312,25 +2425,25 @@
                                 createExplosion(nearest.x, nearest.y, '#00bfff');
                             }
                         }
-                        
+
                         if (!bullet.isPiercing && !bullet.isLaser && !bullet.isMegaLaser && !bullet.isPlasmaWave) {
                             bulletHit = true;
                         }
-                        
+
                         if (asteroid.health <= 0) {
                             gameState.score += asteroid.value;
                             gameState.totalKills++;
-                            
+
                             const config = modeConfig[gameState.mode];
                             let coinReward = Math.ceil((asteroid.golden ? 10 : asteroid.special ? 5 : 1) * config.coinMultiplier);
-                            
+
                             // Double score powerup
                             const deathNow = Date.now();
                             if (activePowerUps.DOUBLE_SCORE && deathNow < activePowerUps.DOUBLE_SCORE) {
                                 gameState.score += asteroid.value;
                                 coinReward *= 2;
                             }
-                            
+
                             // Vampire shots heal player
                             if ((activePowerUps.VAMPIRE_SHOTS && deathNow < activePowerUps.VAMPIRE_SHOTS) ||
                                 activePowerUps.PERM_VAMPIRE === Infinity) {
@@ -2338,11 +2451,11 @@
                                     player.health++;
                                 }
                             }
-                            
+
                             gameState.coinsThisRun += coinReward;
-                            
+
                             createExplosion(asteroid.x, asteroid.y, asteroid.color);
-                            
+
                             // Explosive rounds damage nearby asteroids
                             if (bullet.isExplosive) {
                                 asteroids.forEach(nearby => {
@@ -2355,11 +2468,11 @@
                                     }
                                 });
                             }
-                            
+
                             // Golden asteroids always drop permanent power-ups
                             if (asteroid.golden) {
-                                const permTypes = ['PERM_MULTI_SHOT', 'PERM_DAMAGE', 'PERM_FIRE_RATE', 'PERM_HOMING', 
-                                                   'PERM_PIERCING', 'PERM_LASER', 'PERM_CHAIN', 'PERM_EXPLOSIVE', 'PERM_VAMPIRE', 'PERM_FIRE'];
+                                const permTypes = ['PERM_MULTI_SHOT', 'PERM_DAMAGE', 'PERM_FIRE_RATE', 'PERM_HOMING',
+                                    'PERM_PIERCING', 'PERM_LASER', 'PERM_CHAIN', 'PERM_EXPLOSIVE', 'PERM_VAMPIRE', 'PERM_FIRE'];
                                 const type = permTypes[Math.floor(Math.random() * permTypes.length)];
                                 powerUpItems.push({
                                     x: asteroid.x + asteroid.width / 2 - 15,
@@ -2373,13 +2486,13 @@
                             }
                             // Star asteroids always drop temporary power-ups
                             else if (asteroid.special) {
-                                const tempTypes = ['RAPID_FIRE', 'MULTI_SHOT', 'NUKE', 'DAMAGE_BOOST', 'FIRE_RATE_BOOST', 
-                                                   'HOMING_MISSILES', 'LASER_BEAM', 'SCATTER_SHOT', 'PIERCING_ROUNDS', 
-                                                   'EXPLOSIVE_ROUNDS', 'SPEED_BOOST', 'INVINCIBILITY', 'TIME_SLOW',
-                                                   'DOUBLE_SCORE', 'ORBITAL_STRIKE', 'GHOST_MODE', /* CHAIN_LIGHTNING removed from home listing */ 'MEGA_LASER',
-                                                   'BOOMERANG_SHOTS', 'ASTEROID_RAIN', 'VAMPIRE_SHOTS', 'TRIPLE_SIZE',
-                                                   'PLASMA_WAVE', 'REFLECTOR_SHIELD', 'GRAVITY_WELL', 'FIRE_BULLETS', 'HEALTH_RESTORE'];
-                                
+                                const tempTypes = ['RAPID_FIRE', 'MULTI_SHOT', 'NUKE', 'DAMAGE_BOOST', 'FIRE_RATE_BOOST',
+                                    'HOMING_MISSILES', 'LASER_BEAM', 'SCATTER_SHOT', 'PIERCING_ROUNDS',
+                                    'EXPLOSIVE_ROUNDS', 'SPEED_BOOST', 'INVINCIBILITY', 'TIME_SLOW',
+                                    'DOUBLE_SCORE', 'ORBITAL_STRIKE', 'GHOST_MODE', /* CHAIN_LIGHTNING removed from home listing */ 'MEGA_LASER',
+                                    'BOOMERANG_SHOTS', 'ASTEROID_RAIN', 'VAMPIRE_SHOTS', 'TRIPLE_SIZE',
+                                    'PLASMA_WAVE', 'REFLECTOR_SHIELD', 'GRAVITY_WELL', 'FIRE_BULLETS', 'HEALTH_RESTORE'];
+
                                 // Add unlocked abilities to the pool
                                 let availableTemp = [...tempTypes];
                                 // In expert mode, do not include Time Slow to avoid overwhelming spawn slowdown
@@ -2388,7 +2501,7 @@
                                 }
                                 const allAvailable = [...availableTemp, ...playerData.unlockedAbilities];
                                 const type = allAvailable[Math.floor(Math.random() * allAvailable.length)];
-                                
+
                                 powerUpItems.push({
                                     x: asteroid.x + asteroid.width / 2 - 15,
                                     y: asteroid.y + asteroid.height / 2 - 15,
@@ -2399,10 +2512,10 @@
                                     isPermanent: false
                                 });
                             }
-                            
+
                             return false;
                         }
-                        
+
                         if (!bullet.isPiercing && !bullet.isLaser) {
                             createExplosion(bullet.x, bullet.y, '#ffff00');
                         }
@@ -2411,22 +2524,22 @@
                 });
                 // Keep laser beams alive until their life expires; other bullets removed on hit
                 return !bulletHit || bullet.isLaser;
-            
+
             });
-            
+
             // Update power-ups
             powerUpItems = powerUpItems.filter(item => {
                 item.y += 2;
                 item.pulse += 0.1;
-                
+
                 if (checkCollision(item, player)) {
                     activatePowerUp(item.type);
                     return false;
                 }
-                
+
                 return item.y < canvas.height;
             });
-            
+
             // Update particles
             particles = particles.filter(particle => {
                 particle.x += particle.vx;
@@ -2434,7 +2547,7 @@
                 particle.life -= 0.02;
                 return particle.life > 0;
             });
-            
+
             // Check for nuke
             if (activePowerUps.NUKE_ACTIVE) {
                 asteroids.forEach(asteroid => {
@@ -2448,7 +2561,7 @@
                 delete activePowerUps.NUKE_ACTIVE;
                 updateHUD();
             }
-            
+
             // Orbital Strike - shoots from top every 2 seconds
             if (activePowerUps.ORBITAL_STRIKE && now < activePowerUps.ORBITAL_STRIKE) {
                 if (!activePowerUps.ORBITAL_LAST || now - activePowerUps.ORBITAL_LAST > 2000) {
@@ -2468,7 +2581,7 @@
                     }
                 }
             }
-            
+
             // Asteroid Rain - shoots friendly asteroids at enemies
             if (activePowerUps.ASTEROID_RAIN && now < activePowerUps.ASTEROID_RAIN) {
                 if (!activePowerUps.RAIN_LAST || now - activePowerUps.RAIN_LAST > 1500) {
@@ -2488,11 +2601,11 @@
                     }
                 }
             }
-            
+
             // Tesla Coil removed
-            
+
             // BLACK_HOLE removed
-            
+
             // Shockwave - periodic pulses
             if (activePowerUps.SHOCKWAVE && now < activePowerUps.SHOCKWAVE) {
                 if (!activePowerUps.SHOCKWAVE_LAST || now - activePowerUps.SHOCKWAVE_LAST > 2000) {
@@ -2509,7 +2622,7 @@
                     });
                 }
             }
-            
+
             // Quantum Shield - auto teleport from danger
             if (activePowerUps.QUANTUM_SHIELD && now < activePowerUps.QUANTUM_SHIELD) {
                 let dangerClose = false;
@@ -2533,9 +2646,9 @@
                     }
                 }
             }
-            
+
             // SINGULARITY removed
-            
+
             // Check if boss timer expired and boss not defeated
             if (gameState.bossActive && boss && boss.y >= boss.targetY) {
                 const elapsed = Date.now() - gameState.startTime;
@@ -2554,21 +2667,21 @@
             if (bullets.length > MAX_BULLETS) bullets.splice(0, bullets.length - MAX_BULLETS);
             if (asteroids.length > MAX_ASTEROIDS) asteroids.splice(0, asteroids.length - MAX_ASTEROIDS);
             if (powerUpItems.length > MAX_POWERUPS) powerUpItems.splice(0, powerUpItems.length - MAX_POWERUPS);
-        
+
 
         }
 
         function activatePowerUp(type) {
             const power = powerUpTypes[type];
             if (!power) return;
-            
+
             // Health Restore - instant effect
             if (type === 'HEALTH_RESTORE') {
                 const healAmount = Math.ceil(player.maxHealth * 0.25); // 25% of max health
                 player.health = Math.min(player.maxHealth, player.health + healAmount);
                 return;
             }
-            
+
             // Annihilate - instant massive explosion
             if (type === 'ANNIHILATE') {
                 asteroids.forEach(asteroid => {
@@ -2593,9 +2706,9 @@
                 updateHUD();
                 return;
             }
-            
+
             // SINGULARITY removed
-            
+
             if (type === 'NUKE') {
                 activePowerUps.NUKE_ACTIVE = true;
             } else if (power.permanent) {
@@ -2617,52 +2730,52 @@
                 ctx.translate(ox, oy);
                 ctx.scale(sx, sy);
             }
-            
+
             // Clear canvas
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             // Draw stars
             ctx.fillStyle = '#fff';
             stars.forEach(star => {
                 ctx.fillRect(star.x, star.y, star.size, star.size);
             });
-            
+
             // Draw boss
             if (boss) {
                 ctx.save();
                 ctx.translate(boss.x + boss.width / 2, boss.y + boss.height / 2);
-                
+
                 // Boss body
                 ctx.fillStyle = '#ff0000';
                 ctx.strokeStyle = '#ff6600';
                 ctx.lineWidth = 4;
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = '#ff0000';
-                
+
                 // Draw skull-like shape
                 ctx.beginPath();
                 ctx.arc(0, 0, boss.width / 2, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.stroke();
-                
+
                 // Eyes
                 ctx.fillStyle = '#000';
                 ctx.beginPath();
                 ctx.arc(-25, -10, 15, 0, Math.PI * 2);
                 ctx.arc(25, -10, 15, 0, Math.PI * 2);
                 ctx.fill();
-                
+
                 ctx.shadowBlur = 0;
                 ctx.restore();
-                
+
                 // Boss health bar
                 const barWidth = boss.width;
                 const barHeight = 10;
                 const barX = boss.x;
                 const barY = boss.y - 20;
                 const healthPercent = boss.health / boss.maxHealth;
-                
+
                 ctx.fillStyle = '#330000';
                 ctx.fillRect(barX, barY, barWidth, barHeight);
                 ctx.fillStyle = '#ff0000';
@@ -2670,20 +2783,20 @@
                 ctx.strokeStyle = '#fff';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(barX, barY, barWidth, barHeight);
-                
+
                 // Boss health text
                 ctx.fillStyle = '#fff';
                 ctx.font = 'bold 14px Arial';
                 ctx.textAlign = 'center';
                 ctx.fillText(`BOSS: ${Math.ceil(boss.health)}/${boss.maxHealth}`, boss.x + boss.width / 2, barY - 5);
             }
-            
+
             // Draw player
             ctx.save();
             ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
-            
 
-            
+
+
             ctx.beginPath();
             ctx.moveTo(0, -player.height / 2);
             ctx.lineTo(-player.width / 2, player.height / 2);
@@ -2691,24 +2804,24 @@
             ctx.lineTo(player.width / 2, player.height / 2);
             ctx.closePath();
             ctx.fill();
-            
+
             // Shield visuals removed
-            
+
             ctx.shadowBlur = 0;
             ctx.restore();
-            
+
             // Player health bar
             const healthBarWidth = 100;
             const healthBarHeight = 10;
             const healthBarX = player.x + player.width / 2 - healthBarWidth / 2;
             const healthBarY = player.y - 15;
             const healthPercent = player.health / player.maxHealth;
-            
+
             ctx.fillStyle = '#660000';
             ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
             ctx.fillStyle = '#00ff00';
             ctx.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercent, healthBarHeight);
-            
+
             // Draw bullets
             bullets.forEach(bullet => {
                 if (bullet.isMegaLaser) {
@@ -2776,29 +2889,29 @@
                     // Laser beam - wide bright green beam with inner core
                     ctx.save();
                     ctx.globalCompositeOperation = 'lighter';
-                    
+
                     // Outer glow (widest)
                     ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
                     ctx.shadowBlur = 40;
                     ctx.shadowColor = '#00ff00';
                     ctx.fillRect(bullet.x - 8, 0, bullet.width + 16, canvas.height);
-                    
+
                     // Middle layer
                     ctx.fillStyle = 'rgba(0, 255, 0, 0.6)';
                     ctx.shadowBlur = 25;
                     ctx.fillRect(bullet.x - 4, 0, bullet.width + 8, canvas.height);
-                    
+
                     // Main beam - SOLID and bright
                     ctx.fillStyle = bullet.isMegaLaser ? '#32ff32' : '#00ff00';
                     ctx.shadowBlur = 20;
                     ctx.fillRect(bullet.x, 0, bullet.width, canvas.height);
-                    
+
                     // Inner core (brightest white)
                     ctx.fillStyle = '#ffffff';
                     ctx.shadowBlur = 15;
                     ctx.shadowColor = '#ffffff';
-                    ctx.fillRect(bullet.x + bullet.width/2 - 3, 0, 6, canvas.height);
-                    
+                    ctx.fillRect(bullet.x + bullet.width / 2 - 3, 0, 6, canvas.height);
+
                     ctx.shadowBlur = 0;
                     ctx.restore();
                 } else if (bullet.isHoming) {
@@ -2828,26 +2941,26 @@
                     // Fire bullets - flickering orange/red flames
                     const flameColors = ['#ff4400', '#ff6600', '#ff8800', '#ffaa00'];
                     const flameColor = flameColors[Math.floor(Math.random() * flameColors.length)];
-                    
+
                     // Outer glow
                     ctx.fillStyle = 'rgba(255, 68, 0, 0.3)';
                     ctx.shadowBlur = 20;
                     ctx.shadowColor = '#ff4400';
                     ctx.fillRect(bullet.x - 3, bullet.y - 3, bullet.width + 6, bullet.height + 6);
-                    
+
                     // Main bullet
                     ctx.fillStyle = flameColor;
                     ctx.shadowBlur = 15;
                     ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-                    
+
                     // Flame trail particles
                     for (let i = 0; i < 3; i++) {
                         ctx.fillStyle = `rgba(255, ${100 + i * 40}, 0, ${0.6 - i * 0.2})`;
-                        ctx.fillRect(bullet.x + Math.random() * bullet.width, 
-                                   bullet.y + bullet.height + i * 5, 
-                                   2, 3);
+                        ctx.fillRect(bullet.x + Math.random() * bullet.width,
+                            bullet.y + bullet.height + i * 5,
+                            2, 3);
                     }
-                    
+
                     ctx.shadowBlur = 0;
                 } else if (bullet.isOmegaCannon) {
                     // Omega Cannon - massive red shots
@@ -2889,7 +3002,7 @@
                     ctx.shadowBlur = 25;
                     ctx.shadowColor = '#ff00ff';
                     ctx.beginPath();
-                    ctx.ellipse(bullet.x + bullet.width/2, bullet.y + bullet.height/2, bullet.width/2, bullet.height/2, 0, 0, Math.PI * 2);
+                    ctx.ellipse(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2, bullet.width / 2, bullet.height / 2, 0, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.shadowBlur = 0;
                 } else if (bullet.isDoubleShot) {
@@ -2915,19 +3028,19 @@
                     ctx.shadowBlur = 0;
                 }
             });
-            
+
             // Draw asteroids
             asteroids.forEach(asteroid => {
                 ctx.save();
                 ctx.translate(asteroid.x + asteroid.width / 2, asteroid.y + asteroid.height / 2);
                 ctx.rotate(asteroid.rotation);
-                
+
                 ctx.fillStyle = asteroid.color;
                 ctx.strokeStyle = asteroid.isBossProjectile ? '#ff0000' : '#333';
                 ctx.lineWidth = 3;
                 ctx.shadowBlur = asteroid.golden ? 25 : 15;
                 ctx.shadowColor = asteroid.color;
-                
+
                 ctx.beginPath();
                 for (let i = 0; i < asteroid.sides; i++) {
                     const angle = (i / asteroid.sides) * Math.PI * 2;
@@ -2940,7 +3053,7 @@
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
-                
+
                 // Draw star for special asteroids
                 if (asteroid.special) {
                     ctx.fillStyle = '#ffffff';
@@ -2951,7 +3064,7 @@
                     ctx.shadowColor = '#ffffff';
                     ctx.fillText('★', 0, 0);
                 }
-                
+
                 // Draw crown for golden asteroids
                 if (asteroid.golden) {
                     ctx.fillStyle = '#ffffff';
@@ -2962,7 +3075,7 @@
                     ctx.shadowColor = '#ffd700';
                     ctx.fillText('👑', 0, 0);
                 }
-                
+
                 // Draw fire effect for burning asteroids
                 if (asteroid.isBurning) {
                     ctx.fillStyle = '#ff4400';
@@ -2971,12 +3084,12 @@
                     ctx.textBaseline = 'middle';
                     ctx.shadowBlur = 20;
                     ctx.shadowColor = '#ff4400';
-                    ctx.fillText('🔥', 0, -asteroid.height/2 - 10);
+                    ctx.fillText('🔥', 0, -asteroid.height / 2 - 10);
                 }
-                
+
                 ctx.shadowBlur = 0;
                 ctx.restore();
-                
+
                 // Draw health bar for tough asteroids
                 if (asteroid.maxHealth > 1 && !asteroid.isBossProjectile) {
                     const barWidth = asteroid.width;
@@ -2984,31 +3097,31 @@
                     const barX = asteroid.x;
                     const barY = asteroid.y - 10;
                     const healthPercent = asteroid.health / asteroid.maxHealth;
-                    
+
                     ctx.fillStyle = '#ff0000';
                     ctx.fillRect(barX, barY, barWidth, barHeight);
                     ctx.fillStyle = asteroid.golden ? '#ffd700' : '#00ff00';
                     ctx.fillRect(barX, barY, barWidth * healthPercent, barHeight);
                 }
             });
-            
+
             // Draw power-ups
             powerUpItems.forEach(item => {
                 const powerType = powerUpTypes[item.type];
                 if (!powerType) return;
-                
+
                 ctx.save();
                 ctx.translate(item.x, item.y);
-                
+
                 const pulseSize = 1 + Math.sin(item.pulse) * 0.2;
                 ctx.scale(pulseSize, pulseSize);
-                
+
                 ctx.shadowBlur = item.isPermanent ? 30 : 20;
                 ctx.shadowColor = powerType.color;
                 ctx.fillStyle = powerType.color;
                 ctx.strokeStyle = item.isPermanent ? '#ffd700' : '#fff';
                 ctx.lineWidth = item.isPermanent ? 3 : 2;
-                
+
                 // Permanent power-ups have extra golden ring
                 if (item.isPermanent) {
                     ctx.beginPath();
@@ -3017,7 +3130,7 @@
                     ctx.lineWidth = 4;
                     ctx.stroke();
                 }
-                
+
                 ctx.beginPath();
                 for (let i = 0; i < 6; i++) {
                     const angle = (Math.PI * 2 * i) / 6;
@@ -3029,11 +3142,11 @@
                 ctx.closePath();
                 ctx.fill();
                 ctx.stroke();
-                
+
                 ctx.shadowBlur = 0;
                 ctx.restore();
             });
-            
+
             // Draw particles
             particles.forEach(particle => {
                 ctx.globalAlpha = particle.life;
@@ -3041,12 +3154,12 @@
                 ctx.fillRect(particle.x, particle.y, 3, 3);
                 ctx.globalAlpha = 1;
             });
-            
+
             // Draw boss explosion shockwave
             if (gameState.showingVictory && gameState.bossExplosionRadius !== undefined) {
                 if (gameState.bossExplosionRadius < gameState.bossExplosionMaxRadius) {
                     gameState.bossExplosionRadius += 8;
-                    
+
                     // Draw expanding shockwave rings
                     for (let i = 0; i < 3; i++) {
                         const radius = gameState.bossExplosionRadius - (i * 30);
@@ -3062,7 +3175,7 @@
                     }
                 }
             }
-            
+
             // Draw active power-up indicators (BOTTOM LEFT)
             let indicatorY = canvas.height - 30;
             ctx.font = '14px Arial';
@@ -3127,7 +3240,7 @@
             // Restore any temporary transform or alpha changes
             ctx.globalAlpha = 1;
             if (scaled) ctx.restore();
-            
+
             // Shockwave rings
             if (activePowerUps.SHOCKWAVE_RADIUS !== undefined && activePowerUps.SHOCKWAVE_RADIUS < 300) {
                 ctx.strokeStyle = '#00ff99';
@@ -3135,13 +3248,13 @@
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = '#00ff99';
                 ctx.beginPath();
-                ctx.arc(player.x + player.width/2, player.y + player.height/2, activePowerUps.SHOCKWAVE_RADIUS, 0, Math.PI * 2);
+                ctx.arc(player.x + player.width / 2, player.y + player.height / 2, activePowerUps.SHOCKWAVE_RADIUS, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.shadowBlur = 0;
             }
-            
+
             // SINGULARITY visuals removed
-            
+
             // Draw pause overlay
             if (gameState.isPaused) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -3151,12 +3264,12 @@
                 ctx.textAlign = 'center';
                 ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
             }
-            
+
             // Draw victory message
             if (gameState.showingVictory) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
+
                 ctx.fillStyle = '#ffd700';
                 ctx.font = 'bold 72px Arial';
                 ctx.textAlign = 'center';
@@ -3164,13 +3277,13 @@
                 ctx.shadowBlur = 30;
                 ctx.shadowColor = '#ffd700';
                 ctx.fillText('VICTORY!', canvas.width / 2, canvas.height / 2 - 50);
-                
+
                 ctx.fillStyle = '#00ff88';
                 ctx.font = 'bold 32px Arial';
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = '#00ff88';
                 ctx.fillText('BOSS DEFEATED!', canvas.width / 2, canvas.height / 2 + 30);
-                
+
                 ctx.shadowBlur = 0;
             }
             // Restore transform if we scaled earlier
@@ -3183,9 +3296,9 @@
 
         function checkCollision(rect1, rect2) {
             return rect1.x < rect2.x + rect2.width &&
-                   rect1.x + rect1.width > rect2.x &&
-                   rect1.y < rect2.y + rect2.height &&
-                   rect1.y + rect1.height > rect2.y;
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y;
         }
 
         function createExplosion(x, y, color) {
@@ -3201,72 +3314,97 @@
             }
         }
 
-        function displayLeaderboard() {
+        async function displayLeaderboard() {
             const list = document.getElementById('leaderboardList');
-            if (!playerData.leaderboard || playerData.leaderboard.length === 0) {
-                list.innerHTML = '<p style="color: #aaa; text-align: center; font-size: 18px;">No scores yet. Play to set a record!</p>';
-                return;
-            }
 
-            // Sort leaderboard by score
-            const sorted = [...playerData.leaderboard].sort((a, b) => b.score - a.score).slice(0, 10);
-            
-            list.innerHTML = sorted.map((entry, index) => {
-                const rank = index + 1;
-                const isTop3 = rank <= 3;
-                return `
-                    <div class="leaderboard-entry ${isTop3 ? 'top3' : ''}">
-                        <div class="leaderboard-rank">#${rank}</div>
-                        <div class="leaderboard-name">${entry.name}</div>
-                        <div class="leaderboard-score">${entry.score.toLocaleString()}</div>
-                        <div class="leaderboard-mode">${entry.mode.toUpperCase()}</div>
-                    </div>
-                `;
-            }).join('');
+            try {
+                const baseUrl = globalResetUrl.replace('/reset', '');
+                const res = await fetch(`${baseUrl}/leaderboard`, { cache: 'no-store' });
+                if (!res.ok) throw new Error('Failed to fetch leaderboard');
+                const leaderboardData = await res.json();
+
+                if (!leaderboardData || leaderboardData.length === 0) {
+                    list.innerHTML = '<p style="color: #aaa; text-align: center; font-size: 18px;">No scores yet. Play to set a record!</p>';
+                    return;
+                }
+
+                list.innerHTML = leaderboardData.map((entry, index) => {
+                    const rank = index + 1;
+                    const isTop3 = rank <= 3;
+                    return `
+                        <div class="leaderboard-entry ${isTop3 ? 'top3' : ''}">
+                            <div class="leaderboard-rank">#${rank}</div>
+                            <div class="leaderboard-name">${entry.name}</div>
+                            <div class="leaderboard-score">${entry.score.toLocaleString()}</div>
+                            <div class="leaderboard-mode">${entry.mode.toUpperCase()}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error('Leaderboard error:', e);
+                list.innerHTML = '<p style="color: #ff0000; text-align: center; font-size: 18px;">Error loading leaderboard.</p>';
+            }
         }
 
-        function checkHighScore() {
-            // Check if this score makes it to top 10
-            if (!playerData.leaderboard) playerData.leaderboard = [];
-            
-            const sorted = [...playerData.leaderboard].sort((a, b) => b.score - a.score);
-            const isTopTen = sorted.length < 10 || gameState.score > sorted[sorted.length - 1].score;
-            
-            if (isTopTen) {
+        async function checkHighScore() {
+            // Check if this score makes it to top 10 FROM GLOBAL LEADERRBOARD
+            try {
+                const baseUrl = globalResetUrl.replace('/reset', '');
+                const res = await fetch(`${baseUrl}/leaderboard`, { cache: 'no-store' });
+                if (!res.ok) throw new Error('Failed to fetch leaderboard');
+                const leaderboardData = await res.json();
+
+                const isTopTen = leaderboardData.length < 10 || gameState.score > leaderboardData[leaderboardData.length - 1].score;
+
+                if (isTopTen) {
+                    document.getElementById('highScoreValue').textContent = gameState.score;
+                    document.getElementById('nameInputModal').classList.add('active');
+                    document.getElementById('playerNameInput').value = '';
+                    document.getElementById('playerNameInput').focus();
+                }
+            } catch (e) {
+                console.error('Check high score error:', e);
+                // Fallback: allow submission if there's an error
                 document.getElementById('highScoreValue').textContent = gameState.score;
                 document.getElementById('nameInputModal').classList.add('active');
-                document.getElementById('playerNameInput').value = '';
-                document.getElementById('playerNameInput').focus();
             }
         }
 
-        function submitHighScore() {
+        async function submitHighScore() {
             const name = document.getElementById('playerNameInput').value.trim() || 'Anonymous';
-            
-            if (!playerData.leaderboard) playerData.leaderboard = [];
-            
-            playerData.leaderboard.push({
-                name: name,
-                score: gameState.score,
-                mode: gameState.mode,
-                date: new Date().toISOString()
-            });
-            
-            // Keep only top 10
-            playerData.leaderboard.sort((a, b) => b.score - a.score);
-            if (playerData.leaderboard.length > 10) {
-                playerData.leaderboard = playerData.leaderboard.slice(0, 10);
+
+            try {
+                const baseUrl = globalResetUrl.replace('/reset', '');
+                const res = await fetch(`${baseUrl}/leaderboard`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        score: gameState.score,
+                        mode: gameState.mode
+                    })
+                });
+
+                if (!res.ok) throw new Error('Failed to submit score');
+
+                // Clear local leaderboard just in case it's still used anywhere
+                playerData.leaderboard = [];
+                savePlayerData();
+
+                document.getElementById('nameInputModal').classList.remove('active');
+                showScreen('leaderboard');
+            } catch (e) {
+                console.error('Submit score error:', e);
+                alert('Connection error. Score not saved globally.');
+                document.getElementById('nameInputModal').classList.remove('active');
             }
-            
-            savePlayerData();
-            document.getElementById('nameInputModal').classList.remove('active');
         }
 
         function endGame(victory) {
             gameState.isRunning = false;
             if (asteroidSpawner) clearInterval(asteroidSpawner);
             if (bossTimer) clearTimeout(bossTimer);
-            
+
             // Update player stats
             playerData.gamesPlayed++;
             if (gameState.score > playerData.highScore) {
@@ -3274,7 +3412,7 @@
             }
             playerData.coins += gameState.coinsThisRun;
             playerData.totalKills += gameState.totalKills;
-            
+
             // Check for mode unlocks
             if (gameState.mode === 'normal' && gameState.score >= 5000) {
                 if (!playerData.unlockedModes.includes('hard')) {
@@ -3286,31 +3424,31 @@
                     playerData.unlockedModes.push('expert');
                 }
             }
-            
+
             savePlayerData();
-            
+
             canvas.style.display = 'none';
             document.getElementById('hud').style.display = 'none';
             document.getElementById('instructions').style.display = 'none';
-            
+
             if (victory) {
                 // Show victory screen first
                 document.getElementById('victoryScore').textContent = gameState.score;
                 document.getElementById('victoryCoins').textContent = gameState.coinsThisRun;
                 document.getElementById('victoryScreen').classList.add('active');
-                
+
                 // After 3 seconds, show game over screen and check for high score
                 setTimeout(() => {
                     document.getElementById('victoryScreen').classList.remove('active');
-                    
+
                     const gameOverTitle = document.getElementById('gameOverTitle');
                     gameOverTitle.textContent = 'VICTORY!';
                     gameOverTitle.style.color = '#ffd700';
-                    
+
                     document.getElementById('finalScore').textContent = gameState.score;
                     document.getElementById('coinsEarned').textContent = gameState.coinsThisRun;
                     document.getElementById('gameOver').classList.add('active');
-                    
+
                     // Check if high score after showing game over
                     checkHighScore();
                 }, 3000);
@@ -3319,11 +3457,11 @@
                 const gameOverTitle = document.getElementById('gameOverTitle');
                 gameOverTitle.textContent = 'DEFEATED';
                 gameOverTitle.style.color = '#ff0000';
-                
+
                 document.getElementById('finalScore').textContent = gameState.score;
                 document.getElementById('coinsEarned').textContent = gameState.coinsThisRun;
                 document.getElementById('gameOver').classList.add('active');
-                
+
                 // Check if high score
                 checkHighScore();
             }
@@ -3340,4 +3478,5 @@
         gameLoop();
     </script>
 </body>
+
 </html>
