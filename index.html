@@ -1705,14 +1705,11 @@
             const config = modeConfig[gameState.mode];
             asteroidSpawner = setInterval(spawnAsteroid, config.asteroidSpawnRate);
 
-            // Schedule boss
-            bossTimer = setTimeout(() => {
-                spawnBoss();
-            }, config.bossTime);
+            // Boss will be spawned in update loop based on getGameTime
         }
 
         function spawnAsteroid() {
-            if (gameState.bossActive) return; // No asteroids during boss fight
+            if (gameState.bossActive || gameState.isPaused || !gameState.isRunning) return; // Stop asteroids when paused or during boss
 
             // Cap maximum asteroids on screen at once
             const MAX_ASTEROIDS_ON_SCREEN = 75;
@@ -1725,7 +1722,7 @@
             let specialSpawned = false;
 
             // Spawn count ramps up over time: few at start, many after ~2 minutes
-            let elapsed = Date.now() - (gameState.startTime || Date.now()) - (gameState.totalPauseTime || 0);
+            let elapsed = getGameTime();
 
             // USER REQUEST: expert mode dont increase after 1:30 (90000ms)
             if (gameState.mode === 'expert' && elapsed > 90000) {
@@ -1806,13 +1803,8 @@
             const config = modeConfig[gameState.mode];
             gameState.bossActive = true;
 
-            // Show warning
-            const warning = document.getElementById('bossWarning');
-            warning.style.display = 'block';
-            bossWarningTimeout = setTimeout(() => {
-                warning.style.display = 'none';
-                bossWarningTimeout = null;
-            }, 2000);
+            // Show warning via getGameTime
+            gameState.bossWarningEndTime = getGameTime() + 2000;
 
             // Clear asteroids
             asteroids = [];
@@ -1835,7 +1827,7 @@
         }
 
         function shoot() {
-            const now = Date.now();
+            const now = getGameTime();
             let fireRate = player.fireRate;
 
             // Fire rate boost power-up (temporary or permanent)
@@ -1931,7 +1923,7 @@
                     width: 8,
                     height: canvas.height,
                     speed: 0,
-                    damage: damage * 3.5,
+                    damage: damage * 3.15,
                     isRailgun: true,
                     isPiercing: true,
                     life: 1
@@ -1945,7 +1937,7 @@
                     width: 24,
                     height: canvas.height,
                     speed: 0,
-                    damage: damage * 2.5,
+                    damage: damage * 2.25,
                     isPulsarBeam: true,
                     life: 2,
                     pulsePhase: 0
@@ -2011,7 +2003,7 @@
                     width: 80,
                     height: 600,
                     speed: 0,
-                    damage: damage * 3.5,
+                    damage: damage * 3.15,
                     isLaser: true,
                     isMegaLaser: true,
                     life: 3
@@ -2064,7 +2056,7 @@
             // Laser beam (wide continuous beam - permanent is thinner)
             else if (hasLaser) {
                 const laserWidth = activePowerUps.PERM_LASER === Infinity ? 15 : 20;
-                const laserDamage = activePowerUps.PERM_LASER === Infinity ? damage * 1.0 : damage * 1.2;
+                const laserDamage = activePowerUps.PERM_LASER === Infinity ? damage * 0.9 : damage * 1.08;
                 bullets.push({
                     x: player.x + player.width / 2 - laserWidth / 2,
                     y: player.y,
@@ -2140,13 +2132,19 @@
             gameState.isPaused = !gameState.isPaused;
         }
 
+        function getGameTime() {
+            if (!gameState.isRunning) return 0;
+            if (gameState.isPaused) {
+                return gameState.pauseStartTime - gameState.startTime - gameState.totalPauseTime;
+            }
+            return Date.now() - gameState.startTime - gameState.totalPauseTime;
+        }
+
         function updateHUD() {
             document.getElementById('score').textContent = gameState.score;
             document.getElementById('coins').textContent = gameState.coinsThisRun;
 
-            const elapsed = gameState.bossActive ?
-                modeConfig[gameState.mode].bossTime :
-                Date.now() - gameState.startTime - gameState.totalPauseTime;
+            const elapsed = getGameTime();
             const minutes = Math.floor(elapsed / 60000);
             const seconds = Math.floor((elapsed % 60000) / 1000);
             document.getElementById('timer').textContent =
@@ -2158,6 +2156,8 @@
 
             updateHUD();
 
+            const now = getGameTime();
+
             // Update stars
             stars.forEach(star => {
                 star.y += star.speed;
@@ -2168,7 +2168,7 @@
             });
 
             // Player movement
-            const now = Date.now();
+            // triple size check uses 'now'
 
             // Triple Size power-up
             if (activePowerUps.TRIPLE_SIZE && now < activePowerUps.TRIPLE_SIZE) {
@@ -2405,7 +2405,7 @@
 
             // Update asteroids
             asteroids = asteroids.filter(asteroid => {
-                const astNow = Date.now();
+                const astNow = getGameTime();
                 let asteroidSpeed = asteroid.speed;
 
                 // Time slow effect
@@ -2532,7 +2532,7 @@
                         // Fire bullets apply burning damage over time
                         if (bullet.isFire && !asteroid.isBurning) {
                             asteroid.isBurning = true;
-                            asteroid.burnStartTime = Date.now();
+                            asteroid.burnStartTime = getGameTime();
                             asteroid.burnDamage = bullet.damage * 0.3; // 30% of bullet damage per tick
                             asteroid.burnTicks = 5; // Burns for 5 ticks
                         }
@@ -2569,7 +2569,7 @@
                             let coinReward = Math.ceil((asteroid.golden ? 10 : asteroid.special ? 5 : 1) * config.coinMultiplier);
 
                             // Double score powerup
-                            const deathNow = Date.now();
+                            const deathNow = getGameTime();
                             if (activePowerUps.DOUBLE_SCORE && deathNow < activePowerUps.DOUBLE_SCORE) {
                                 gameState.score += asteroid.value;
                                 coinReward *= 2;
@@ -2795,11 +2795,24 @@
 
             // SINGULARITY removed
 
+            // Boss warning visibility
+            const warning = document.getElementById('bossWarning');
+            if (gameState.bossWarningEndTime && now < gameState.bossWarningEndTime) {
+                warning.style.display = 'block';
+            } else {
+                warning.style.display = 'none';
+                gameState.bossWarningEndTime = null;
+            }
+
+            // Check for boss spawn
+            const config = modeConfig[gameState.mode];
+            if (!gameState.bossActive && !gameState.bossDefeated && now >= config.bossTime) {
+                spawnBoss();
+            }
+
             // Check if boss timer expired and boss not defeated
             if (gameState.bossActive && boss && boss.y >= boss.targetY) {
-                const elapsed = Date.now() - gameState.startTime;
-                const bossTime = modeConfig[gameState.mode].bossTime;
-                if (elapsed > bossTime + 150000) { // Boss has 60 seconds
+                if (now > config.bossTime + 150000) {
                     endGame(false); // Player loses
                 }
             }
@@ -2865,7 +2878,7 @@
                 // Permanent power-ups never expire (set to Infinity)
                 activePowerUps[type] = Infinity;
             } else {
-                activePowerUps[type] = Date.now() + power.duration;
+                activePowerUps[type] = getGameTime() + power.duration;
             }
         }
 
@@ -3011,7 +3024,7 @@
                     // Boomerang - spinning pink
                     ctx.save();
                     ctx.translate(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2);
-                    ctx.rotate(Date.now() * 0.01);
+                    ctx.rotate(getGameTime() * 0.01);
                     ctx.fillStyle = '#ff69b4';
                     ctx.shadowBlur = 15;
                     ctx.shadowColor = '#ff69b4';
@@ -3030,7 +3043,7 @@
                     ctx.save();
                     ctx.translate(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2);
                     ctx.rotate(bullet.rotation || 0);
-                    bullet.rotation = (bullet.rotation || 0) + 0.1;
+                    if (!gameState.isPaused) bullet.rotation = (bullet.rotation || 0) + 0.1;
                     ctx.fillStyle = '#ff6347';
                     ctx.strokeStyle = '#8b0000';
                     ctx.lineWidth = 2;
@@ -3132,7 +3145,7 @@
                     ctx.shadowBlur = 0;
                 } else if (bullet.isPulsarBeam) {
                     // Pulsar Beam - pulsing yellow beam
-                    bullet.pulsePhase = (bullet.pulsePhase || 0) + 0.2;
+                    if (!gameState.isPaused) bullet.pulsePhase = (bullet.pulsePhase || 0) + 0.2;
                     const pulseAlpha = 0.5 + Math.sin(bullet.pulsePhase) * 0.3;
                     ctx.fillStyle = `rgba(255, 255, 0, ${pulseAlpha})`;
                     ctx.shadowBlur = 20 + Math.sin(bullet.pulsePhase) * 10;
@@ -3347,9 +3360,9 @@
                         ctx.fillText(`${powerType.name}: ∞`, 20, indicatorY);
                         ctx.shadowBlur = 0;
                         indicatorY -= 25;
-                    } else if (Date.now() < endTime) {
+                    } else if (getGameTime() < endTime) {
                         // Temporary power-up with timer
-                        const timeLeft = Math.ceil((endTime - Date.now()) / 1000);
+                        const timeLeft = Math.ceil((endTime - getGameTime()) / 1000);
                         ctx.fillStyle = powerType.color;
                         ctx.shadowBlur = 5;
                         ctx.shadowColor = powerType.color;
@@ -3361,7 +3374,7 @@
             }
 
             // Special visuals for active power-ups
-            const drawNow = Date.now();
+            const drawNow = getGameTime();
             let scaled = false;
 
             // Triple size (scales drawing temporarily)
