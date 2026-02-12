@@ -1369,12 +1369,25 @@
             renderShop();
         }
 
-        function updateStats() {
+        async function updateStats() {
             document.getElementById('statHighScore').textContent = playerData.highScore;
-            document.getElementById('statGames').textContent = playerData.gamesPlayed; // Updated to reflect correct stats
+            document.getElementById('statGames').textContent = playerData.gamesPlayed;
             document.getElementById('statKills').textContent = playerData.totalKills;
             document.getElementById('statCoins').textContent = playerData.coins;
             document.getElementById('statBosses').textContent = playerData.bossesDefeated;
+
+            try {
+                const baseUrl = globalResetUrl.split('/reset')[0].replace(/\/$/, "");
+                const res = await fetch(`${baseUrl}/leaderboard`, { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        console.log('Global Best:', data[0].score);
+                    }
+                }
+            } catch (e) {
+                console.warn('Stats sync skipped:', e.message);
+            }
         }
 
         function resetProgress() {
@@ -1399,14 +1412,8 @@
             } catch (e) {
                 adminLog = [];
             }
-            // Load global reset config
-            try {
-                globalResetUrl = localStorage.getItem('spaceShooterGlobalResetURL') || globalResetUrl || '';
-                lastGlobalResetTS = localStorage.getItem('spaceShooterGlobalResetTS') || lastGlobalResetTS || null;
-            } catch (e) {
-                globalResetUrl = globalResetUrl || '';
-                lastGlobalResetTS = lastGlobalResetTS || null;
-            }
+            // Global reset config is now hardcoded to production
+            lastGlobalResetTS = localStorage.getItem('spaceShooterGlobalResetTS') || null;
         }
 
         function savePlayerData() {
@@ -3395,7 +3402,7 @@
                 showScreen('leaderboard');
             } catch (e) {
                 console.error('Submit score error:', e);
-                alert('Connection error. Score not saved globally.');
+                alert(`Connection error to ${globalResetUrl.split('/reset')[0]}. Score not saved globally. Error: ${e.message}`);
                 document.getElementById('nameInputModal').classList.remove('active');
             }
         }
